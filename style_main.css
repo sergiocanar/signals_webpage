@@ -1,0 +1,76 @@
+/* General */
+html, body {
+    height: 100%;  /* Ensure full height of the viewport */
+    margin: 0;
+    padding: 0;
+    background-color: #F9F5FF;
+    font-family: Arial, sans-serif;
+    text-align: center; /* Center all text horizontally */
+}
+
+/* Header */
+header {
+    background-color: #333;
+    color: #F9F5FF;
+    padding: 20px 0;
+}
+
+/* Sections */
+section {
+    padding: 20px;
+    margin: 20px;
+    background-color: #F9F5FF;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    margin: 0;
+    font-size: 2em;
+    color: #333;
+}
+
+h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+
+/* Button */
+button {
+    padding: 10px 20px;
+    font-size: 1em;
+    color: #f7f7f7;
+    background-color: #14248A;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* List */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
