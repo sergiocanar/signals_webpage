@@ -10,7 +10,7 @@ html, body {
 
 /* Header */
 header {
-    background-color: #333;
+    background-color: #28262C;
     color: #F9F5FF;
     padding: 20px 0;
 }
@@ -27,13 +27,13 @@ section {
 h1 {
     margin: 0;
     font-size: 2em;
-    color: #333;
+    color: #28262C;
 }
 
 h2 {
     margin: 0;
     font-size: 1.5em;
-    color: #333;
+    color: #28262C;
 }
 
 
@@ -68,9 +68,14 @@ li {
 footer {
     text-align: center;
     padding: 10px;
-    background-color: #333;
+    background-color: #28262C;
     color: white;
     width: 100%;
     position: absolute;
     bottom: 0;
+}
+
+a:link, a:visited {
+    color: #f7f7f7;
+    text-decoration: none;
 }
