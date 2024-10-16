@@ -14,7 +14,6 @@
     <figure>
         <img src="https://data.org/wp-content/uploads/2022/02/Universidad-de-los-Andes-975x377.png" alt="Universidad de los Andes" style="width: 10%">
         <figcaption>Departamento de Ingenieria Biomedica</figcaption>
-
     </figure>
 
     <label for="value1">Frequency: </label>
@@ -22,72 +21,41 @@
     <span id="value1Display">0 Hz</span>
 
     <div id="ecg-container" style="width: 100%; height: 400px;"></div>
+    <div id="tachogram-container" style="width: 100%; height: 400px; margin-top: 20px;"></div>
 
     <script>
         function updateValue(val) {
             document.getElementById('value1Display').innerText = val + " Hz";
         }
-        
-        // Function to create an artificial ECG signal with randomized frequency and amplitude
+
+        // Function to create an artificial ECG signal
         function createECG() {
-            const width = 500; // Width of the canvas or the number of points in the signal
-            const height = 200; // Height of the canvas
-            
-            const amplitude = height / 2; // Set amplitude relative to the canvas height
-            const sampleRate = parseInt(document.getElementById('value1').value); // Get value from the range input (Hz)
-                    
-            const timePerSample = 1 / sampleRate; // Time duration of each sample in seconds
-            
-            // Parameters for the sinusoidal signal
-            const maxAmplitude = amplitude * (0.5 + Math.random() * 0.5); // Random amplitude between 0.5 and 1 times the max height
-            const waveFrequency = 0.5 + Math.random() * 2; // Random frequency between 0.5 and 2 Hz
-        
+            const width = 500;
+            const height = 200;
+            const amplitude = height / 2;
+            const sampleRate = parseInt(document.getElementById('value1').value);
+            const timePerSample = 1 / sampleRate;
+
+            const maxAmplitude = amplitude * (0.5 + Math.random() * 0.5);
+            const waveFrequency = 0.5 + Math.random() * 2;
+
             const time_array = [];
-            const signal = []; 
-        
+            const signal = [];
+
             for (let i = 0; i < width; i++) {
-                let t = i * timePerSample; // Time in seconds for the current sample
-                let y = maxAmplitude * Math.sin(2 * Math.PI * waveFrequency * t); // Sinusoidal wave formula
-                time_array.push(t); // Add the time to the time array
-                signal.push(y); // Add the value to the signal array
+                let t = i * timePerSample;
+                let y = maxAmplitude * Math.sin(2 * Math.PI * waveFrequency * t);
+                time_array.push(t);
+                signal.push(y);
             }
-        
+
             return { time_array, signal };
         }
-        
 
-        // Function to plot ECG signal using Highcharts
-        function plotECG() {
-            const data = createECG(); // Get ECG signal data
+    
 
-            if (data.signal.length > 0) {
-                Highcharts.chart('ecg-container', {
-                    chart: {
-                        type: 'line'
-                    },
-                    title: {
-                        text: 'ECG Signal Plot'
-                    },
-                    xAxis: {
-                        title: {
-                            text: 'Time (seconds)'
-                        },
-                        categories: data.time_array // Time values for the x-axis
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'Amplitude'
-                        }
-                    },
-                    series: [{
-                        name: 'ECG Signal',
-                        data: data.signal // Amplitude values for the y-axis
-                    }]
-                });
-            }
-        }
-                // Detect peaks to calculate RR intervals for the tachogram
-                function detectPeaks(signal) {
+        // Detect peaks to calculate RR intervals for the tachogram
+        function detectPeaks(signal) {
             const peaks = [];
             const threshold = Math.max(...signal) * 0.7; // Threshold, 70% of the max amplitude
 
@@ -144,15 +112,16 @@
         // Re-plot the signal whenever the slider is moved
         document.getElementById('value1').addEventListener('input', plotECG);
 
-        // Automatically update the ECG signal every 1 second (1000 milliseconds)
-        setInterval(plotECG, 10000); // Change the interval time as needed (in milliseconds)
+        // Automatically update the ECG and tachogram every 10 seconds
+        setInterval(plotECG, 10000);
     </script>
-
 </body>
+
+<div id="tachogram-container" style="width: 100%; height: 400px; margin-top: 20px;"></div>
 
 <footer id="footer">
     <p>Authors: Sergio Andres Canar Lozano (202020383) and David Tobon Molina (202123804)</p>
-    <p>GitHub Profiles: <a href="https://github.com/sergiocanar">sergiocanar</a> and <a href="https://github.com/DavidTobonIBIO"> DavidTobonIBIO</a></p>
+    <p>GitHub Profiles: <a href="https://github.com/sergiocanar">sergiocanar</a> and <a href="https://github.com/DavidTobonIBIO">DavidTobonIBIO</a></p>
     <p>Source code: <a href="https://github.com/sergiocanar/singnals_webpage">https://github.com/sergiocanar/singnals_webpage</a></p>
 </footer>
 
