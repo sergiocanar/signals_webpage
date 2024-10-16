@@ -86,6 +86,60 @@
                 });
             }
         }
+                // Detect peaks to calculate RR intervals for the tachogram
+                function detectPeaks(signal) {
+            const peaks = [];
+            const threshold = Math.max(...signal) * 0.7; // Threshold, 70% of the max amplitude
+
+            for (let i = 1; i < signal.length - 1; i++) {
+                if (signal[i] > threshold && signal[i] > signal[i - 1] && signal[i] > signal[i + 1]) {
+                    peaks.push(i); // Store the index of the peak
+                }
+            }
+
+            return peaks;
+        }
+
+        // Calculate RR intervals (in seconds)
+        function calculateRRIntervals(peaks, time_array) {
+            const rr_intervals = [];
+
+            for (let i = 1; i < peaks.length; i++) {
+                const rr = time_array[peaks[i]] - time_array[peaks[i - 1]]; // Calculate RR interval
+                rr_intervals.push(rr);
+            }
+
+            return rr_intervals;
+        }
+
+        // Function to plot the ECG signal using Highcharts
+        function plotECG() {
+            const data = createECG();
+
+            Highcharts.chart('ecg-container', {
+                chart: { type: 'line' },
+                title: { text: 'ECG Signal Plot' },
+                xAxis: { title: { text: 'Time (seconds)' }, categories: data.time_array },
+                yAxis: { title: { text: 'Amplitude' } },
+                series: [{ name: 'ECG Signal', data: data.signal }]
+            });
+
+            const peaks = detectPeaks(data.signal);
+            const rr_intervals = calculateRRIntervals(peaks, data.time_array);
+
+            plotTachogram(rr_intervals);
+        }
+
+        // Function to plot the tachogram (RR intervals)
+        function plotTachogram(rr_intervals) {
+            Highcharts.chart('tachogram-container', {
+                chart: { type: 'line' },
+                title: { text: 'Tachogram (RR Intervals)' },
+                xAxis: { title: { text: 'Beat Number' }, categories: rr_intervals.map((_, i) => i + 1) },
+                yAxis: { title: { text: 'RR Interval (seconds)' } },
+                series: [{ name: 'RR Interval', data: rr_intervals }]
+            });
+        }
 
         // Re-plot the signal whenever the slider is moved
         document.getElementById('value1').addEventListener('input', plotECG);
