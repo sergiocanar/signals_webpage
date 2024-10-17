@@ -51,33 +51,39 @@
 
             return { time_array, signal };
         }
+        // Funciones auxiliares para la detección de picos
+        
+        // Calcular RMS (Root Mean Square) para una señal
 
-    
+        function calcularRMS(signal) {
+            const squared = signal.map(x => x * x);
+            const mean = squared.reduce((a, b) => a + b) / squared.length;
+            return Math.sqrt(mean);
+        }        
 
-        // Detect peaks to calculate RR intervals for the tachogram
-        function detectPeaks(signal) {
+        // Función para detectar picos usando desviación estándar como umbral dinámico
+        function detectarPicos(signal, windowSize = 463) {
+            const rms = calcularRMS(signal);
+            const amplitud = Math.std(rms) * 5;  // Amplitud basada en la desviación estándar * 5
+
             const peaks = [];
-            const threshold = Math.max(...signal) * 0.7; // Threshold, 70% of the max amplitude
-
             for (let i = 1; i < signal.length - 1; i++) {
-                if (signal[i] > threshold && signal[i] > signal[i - 1] && signal[i] > signal[i + 1]) {
-                    peaks.push(i); // Store the index of the peak
+                if (
+                    signal[i] > amplitud &&
+                    signal[i] > signal[i - 1] &&
+                    signal[i] > signal[i + 1]
+                ) {
+                    peaks.push(i);
                 }
             }
 
-            return peaks;
-        }
+            const higherPeak = Math.max(...peaks);
 
-        // Calculate RR intervals (in seconds)
-        function calculateRRIntervals(peaks, time_array) {
-            const rr_intervals = [];
+            // Extraer segmentos alrededor del pico más alto
+            const rmsPico = rms.slice(higherPeak - windowSize, higherPeak + windowSize);
+            const señalPico = signal.slice(higherPeak - windowSize, higherPeak + windowSize);
 
-            for (let i = 1; i < peaks.length; i++) {
-                const rr = time_array[peaks[i]] - time_array[peaks[i - 1]]; // Calculate RR interval
-                rr_intervals.push(rr);
-            }
-
-            return rr_intervals;
+            return { rmsPico, señalPico };
         }
 
         // Function to plot the ECG signal using Highcharts
