@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="style_main.css"> 
+    <link rel="stylesheet" href="style_main.css">
     <script src="https://code.highcharts.com/highcharts.js"></script>
 </head>
 
-<body> 
+<body>
     <h1 id="title">ECG Visualization</h1>
     <h2 id="subtitle">Lab 4</h2>
     <figure>
-        <img src="https://data.org/wp-content/uploads/2022/02/Universidad-de-los-Andes-975x377.png" alt="Universidad de los Andes" style="width: 10%">
+        <img src="https://data.org/wp-content/uploads/2022/02/Universidad-de-los-Andes-975x377.png" 
+             alt="Universidad de los Andes" style="width: 10%">
         <figcaption>Departamento de Ingenieria Biomedica</figcaption>
     </figure>
 
@@ -28,12 +30,12 @@
             document.getElementById('value1Display').innerText = val + " Hz";
         }
 
-        // Function to create an artificial ECG signal
+        // Función para crear una señal artificial de ECG
         function createECG() {
             const width = 500;
             const height = 200;
             const amplitude = height / 2;
-            const sampleRate = parseInt(document.getElementById('value1').value);
+            const sampleRate = parseInt(document.getElementById('value1').value) || 10;
             const timePerSample = 1 / sampleRate;
 
             const maxAmplitude = amplitude * (0.5 + Math.random() * 0.5);
@@ -51,44 +53,82 @@
 
             return { time_array, signal };
         }
-        // Funciones auxiliares para la detección de picos
-        
-        // Calcular RMS (Root Mean Square) para una señal
 
-        function calcularRMS(signal) {
-            const squared = signal.map(x => x * x);
-            const mean = squared.reduce((a, b) => a + b) / squared.length;
-            return Math.sqrt(mean);
-        }        
+        // Función para detectar picos dentro de una ventana específica
 
-        // Función para detectar picos usando desviación estándar como umbral dinámico
-        function detectarPicos(signal, windowSize = 463) {
-            const rms = calcularRMS(signal);
-            const amplitud = Math.std(rms) * 5;  // Amplitud basada en la desviación estándar * 5
-
+        function detectPeaksInWindow(signal, start, end) {
             const peaks = [];
-            for (let i = 1; i < signal.length - 1; i++) {
-                if (
-                    signal[i] > amplitud &&
-                    signal[i] > signal[i - 1] &&
-                    signal[i] > signal[i + 1]
-                ) {
-                    peaks.push(i);
+            const window = signal.slice(start, end); 
+            const peakValues = window.filter((val, i) =>
+                i > 0 && i < window.length - 1 && val > window[i - 1] && val > window[i + 1]
+            );
+
+            if (peakValues.length > 0) {
+                const meanVal = mean(peakValues);
+                const stdVal = std(peakValues, meanVal);
+
+                const minThreshold = meanVal + 1 * stdVal;
+                const maxThreshold = meanVal + 4 * stdVal;
+
+                for (let i = 1; i < window.length - 1; i++) {
+                    if (
+                        window[i] >= minThreshold &&
+                        window[i] <= maxThreshold &&
+                        window[i] > window[i - 1] &&
+                        window[i] > window[i + 1]
+                    ) {
+                        peaks.push(start + i);
+                    }
+                }
+            }
+            return peaks;
+        }
+
+        // Detección de picos con ventanas deslizantes
+        function detectPeaksWithSlidingWindow(signal, windowSize, step) {
+            const allPeaks = [];
+
+            for (let start = 0; start < signal.length - windowSize; start += step) {
+                const end = start + windowSize;
+                const peaks = detectPeaksInWindow(signal, start, end);
+                allPeaks.push(...peaks);
+            }
+
+            return allPeaks;
+        }
+
+        // Funciones auxiliares para calcular media y desviación estándar
+        function mean(arr) {
+            return arr.reduce((sum, value) => sum + value, 0) / arr.length;
+        }
+
+        function std(arr, meanVal) {
+            const variance = arr.reduce((sum, value) => sum + Math.pow(value - meanVal, 2), 0) / arr.length;
+            return Math.sqrt(variance);
+        }
+
+
+        // Calcular los RR-intervalos
+        function calculateRRIntervals(peaks, time_array) {
+            const rr_intervals = [];
+
+            for (let i = 1; i < peaks.length; i++) {
+                const rr = time_array[peaks[i]] - time_array[peaks[i - 1]];
+
+                // No negativoso
+                if (rr > 0) {
+                    rr_intervals.push(rr);
                 }
             }
 
-            const higherPeak = Math.max(...peaks);
-
-            // Extraer segmentos alrededor del pico más alto
-            const rmsPico = rms.slice(higherPeak - windowSize, higherPeak + windowSize);
-            const señalPico = signal.slice(higherPeak - windowSize, higherPeak + windowSize);
-
-            return { rmsPico, señalPico };
+            return rr_intervals;
         }
 
-        // Function to plot the ECG signal using Highcharts
+        // Función para graficar el ECG usando Highcharts
         function plotECG() {
             const data = createECG();
+            const peaks = detectPeaksWithSlidingWindow(data.signal, 463, 10); // Usar ventanas de tamaño 463 y paso 10
+            const rr_intervals = calculateRRIntervals(peaks, data.time_array);
 
             Highcharts.chart('ecg-container', {
                 chart: { type: 'line' },
@@ -98,37 +138,43 @@
                 series: [{ name: 'ECG Signal', data: data.signal }]
             });
 
-            const peaks = detectPeaks(data.signal);
-            const rr_intervals = calculateRRIntervals(peaks, data.time_array);
-
             plotTachogram(rr_intervals);
         }
 
-        // Function to plot the tachogram (RR intervals)
+        // Función para graficar el tachograma
         function plotTachogram(rr_intervals) {
             Highcharts.chart('tachogram-container', {
                 chart: { type: 'line' },
                 title: { text: 'Tachogram (RR Intervals)' },
-                xAxis: { title: { text: 'Beat Number' }, categories: rr_intervals.map((_, i) => i + 1) },
+                xAxis: { 
+                    title: { text: 'Beat Number' },
+                    min: 0,
+                    allowDecimals: false
+                },
                 yAxis: { title: { text: 'RR Interval (seconds)' } },
-                series: [{ name: 'RR Interval', data: rr_intervals }]
+                series: [{ 
+                    name: 'RR Interval', 
+                    data: rr_intervals.map((interval, index) => [index, interval]) // Usar el índice para el eje X
+                }]
             });
         }
 
-        // Re-plot the signal whenever the slider is moved
+        // Re-graficar cada vez que se mueve el slider
         document.getElementById('value1').addEventListener('input', plotECG);
 
-        // Automatically update the ECG and tachogram every 10 seconds
+        // Actualizar ECG y tachograma cada 10 segundos
         setInterval(plotECG, 10000);
+
+  
     </script>
+
+    <footer id="footer">
+        <p>Authors: Sergio Andres Canar Lozano (202020383) and David Tobon Molina (202123804)</p>
+        <p>GitHub Profiles: <a href="https://github.com/sergiocanar">sergiocanar</a> and 
+           <a href="https://github.com/DavidTobonIBIO">DavidTobonIBIO</a></p>
+        <p>Source code: <a href="https://github.com/sergiocanar/singnals_webpage">
+            https://github.com/sergiocanar/singnals_webpage</a></p>
+    </footer>
 </body>
-
-<div id="tachogram-container" style="width: 100%; height: 400px; margin-top: 20px;"></div>
-
-<footer id="footer">
-    <p>Authors: Sergio Andres Canar Lozano (202020383), David Tobon Molina (202123804), Wilman Sanchez (202116779) and Martin Salcedo (202123644) </p>
-    <p>GitHub Profiles: <a href="https://github.com/sergiocanar">sergiocanar</a>, <a href="https://github.com/DavidTobonIBIO">DavidTobonIBIO</a>, <a href="https://github.com/msalcedog">msalcedog</a> and , <a href="https://github.com/wilmanw">wilmanw</a> </p>
-    <p>Source code: <a href="https://github.com/sergiocanar/singnals_webpage">https://github.com/sergiocanar/singnals_webpage</a></p>
-</footer>
 
 </html>
