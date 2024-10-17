@@ -66,14 +66,19 @@ li {
 
 /* Footer */
 footer {
-    text-align: center;
-    padding: 10px;
+    position: fixed; /* Keep footer fixed at the bottom */
+    bottom: 0;
+    left: 0; /* Ensure it stays on the left */
+    width: 100%; /* Full width */
     background-color: #28262C;
     color: white;
-    width: 100%;
-    position: fixed;
-    bottom: 0;
+    padding: 10px;
+    text-align: center;
+    z-index: 10; /* Make sure it's above other content */
+    max-height: 100px; /* Limit the height to 100px */
+    overflow-y: auto; /* Enable scrolling if content exceeds the height */
 }
+
 
 a:link, a:visited {
     color: #f7f7f7;
