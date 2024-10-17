@@ -19,8 +19,8 @@
     </figure>
 
     <label for="value1">Frequency: </label>
-    <input type="range" id="value1" min="0" max="100" value="0" step="1" oninput="updateValue(this.value)">
-    <span id="value1Display">0 Hz</span>
+    <input type="range" id="value1" min="10" max="500" value="10" step="10" oninput="updateValue(this.value)">
+    <span id="value1Display">10 Hz</span>
 
     <div id="ecg-container" style="width: 100%; height: 400px;"></div>
     <div id="tachogram-container" style="width: 100%; height: 400px; margin-top: 20px;"></div>
@@ -28,31 +28,30 @@
     <script>
         function updateValue(val) {
             document.getElementById('value1Display').innerText = val + " Hz";
+            plotECG();  // Actualiza el gráfico cuando se mueve el slider
         }
 
-        // Función para crear una señal artificial de ECG
         function createECG() {
-            const width = 500;
+            const number_data = 1000;
             const height = 200;
             const amplitude = height / 2;
-            const sampleRate = parseInt(document.getElementById('value1').value) || 10;
+            const sampleRate = parseInt(document.getElementById('value1').value);
             const timePerSample = 1 / sampleRate;
 
-            const maxAmplitude = amplitude * (0.5 + Math.random() * 0.5);
-            const waveFrequency = 0.5 + Math.random() * 2;
+            const maxAmplitude = amplitude * (0.5 + 0.5 * 0.5);
+            const waveFrequency = 5;  // Por ejemplo, establecer la frecuencia de la señal a 5 Hz
 
-            const time_array = [];
             const signal = [];
 
-            for (let i = 0; i < width; i++) {
+            for (let i = 0; i < number_data; i++) {
                 let t = i * timePerSample;
                 let y = maxAmplitude * Math.sin(2 * Math.PI * waveFrequency * t);
-                time_array.push(t);
                 signal.push(y);
             }
 
+            const time_array = Array.from({ length: signal.length }, (_, i) => i * timePerSample);
             return { time_array, signal };
-        }
+}
 
         // Función para detectar picos dentro de una ventana específica
         function detectPeaksInWindow(signal, start, end) {
@@ -106,7 +105,6 @@
             return Math.sqrt(variance);
         }
 
-
         // Calcular los RR-intervalos
         function calculateRRIntervals(peaks, time_array) {
             const rr_intervals = [];
@@ -120,18 +118,19 @@
                 }
             }
 
-    return rr_intervals;
-}
+            return rr_intervals;
+        }
+
         // Función para graficar el ECG usando Highcharts
         function plotECG() {
             const data = createECG();
-            const peaks = detectPeaksWithSlidingWindow(data.signal, 463, 20); // Usar ventanas de tamaño 463 y paso 10
+            const peaks = detectPeaksWithSlidingWindow(data.signal, 463, 10); // Usar ventanas de tamaño 463 y paso 10
             const rr_intervals = calculateRRIntervals(peaks, data.time_array);
 
             Highcharts.chart('ecg-container', {
                 chart: { type: 'line' },
                 title: { text: 'ECG Signal Plot' },
-                xAxis: { title: { text: 'Time (seconds)' }, categories: data.time_array },
+                xAxis: { title: { text: 'Time (seconds)' }, min: 0, tickInterval: 0.1, categories: data.time_array },
                 yAxis: { title: { text: 'Amplitude' } },
                 series: [{ name: 'ECG Signal', data: data.signal }]
             });
@@ -146,23 +145,19 @@
                 title: { text: 'Tachogram (RR Intervals)' },
                 xAxis: { 
                     title: { text: 'Beat Number' },
-                    // Cambiar a eje numérico en lugar de categorías
                     min: 0,
                     allowDecimals: false
                 },
                 yAxis: { title: { text: 'RR Interval (seconds)' } },
                 series: [{ 
                     name: 'RR Interval', 
-                    data: rr_intervals.map((interval, index) => [index, interval]) // Usar el índice para el eje X
+                    data: rr_intervals.map((interval, index) => [index + 1, interval]) 
                 }]
             });
         }
 
-        // Re-graficar cada vez que se mueve el slider
-        document.getElementById('value1').addEventListener('input', plotECG);
-
-        // Actualizar ECG y tachograma cada 10 segundos
-        setInterval(plotECG, 10000);
+        // Llama a plotECG al cargar la página
+        document.addEventListener('DOMContentLoaded', plotECG);
     </script>
 
     <footer id="footer">
