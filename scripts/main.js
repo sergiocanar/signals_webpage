@@ -4,17 +4,17 @@ let rrIntervals = [];
 
 function updateECG() {
     let freqVal = parseInt(document.getElementById('freq').value);
-    let nDataVal = parseInt(document.getElementById('exploreECG').value);
-    let windowSizeVal = parseInt(document.getElementById('windowSize').value);
-    document.getElementById('freqDisplay').innerText = freqVal + " Hz";
-    document.getElementById('nDataDisplay').innerText = nDataVal;
-    document.getElementById('windowSizeDisplay').innerText = windowSizeVal;
+    let nDataVal = parseInt(document.getElementById('start-point').value);
+    let windowSizeVal = parseInt(document.getElementById('window-size').value);
+    document.getElementById('freq-display').innerText = freqVal + " Hz";
+    document.getElementById('start-point-display').innerText = nDataVal;
+    document.getElementById('window-size-display').innerText = windowSizeVal;
     updateECGPlot(freqVal, nDataVal, windowSizeVal);  // Actualiza el gráfico cuando se mueve cualquier slider
 }
 
 function setMaxSliderValues(nData) {
-    document.getElementById('exploreECG').max = nData;
-    document.getElementById('windowSize').max = nData;
+    document.getElementById('start-point').max = nData;
+    document.getElementById('window-size').max = nData;
 }
 
 function createECG(sampleRate) {
@@ -160,5 +160,14 @@ function calculateBPM() {
 // Llama a plotECG al cargar la página
 document.addEventListener('DOMContentLoaded', updateECG);
 
-let btnCalculateBPM = document.getElementById("calculateBPM");
+let btnCalculateBPM = document.getElementById("calculate-bpm");
 btnCalculateBPM.onclick = () => calculateBPM();
+
+let freqSlider = document.getElementById("freq");
+freqSlider.oninput = () => updateECG();
+
+let startPointSlider = document.getElementById("start-point");
+startPointSlider.oninput = () => updateECG();
+
+let windowSizeSlider = document.getElementById("window-size");
+startPointSlider.oninput = () => updateECG();
