@@ -6,6 +6,14 @@ html, body {
     background-color: #F9F5FF;
     font-family: Arial, sans-serif;
     text-align: center; /* Center all text horizontally */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    flex: 1; /* This allows the container to grow and fill the available space */
+    padding-bottom: 60px; /* Adjust this to match the footer height */
 }
 
 /* Header */
@@ -75,13 +83,15 @@ footer {
     padding: 10px;
     text-align: center;
     z-index: 10; /* Make sure it's above other content */
-    max-height: 100px; /* Limit the height to 100px */
     overflow-y: auto; /* Enable scrolling if content exceeds the height */
 }
 
+a {
+    color: #d7db1c;
+}
 
 a:link, a:visited {
-    color: #f7f7f7;
+    color: #d4c2fc;
     text-decoration: none;
 }
 
@@ -96,6 +106,8 @@ a:link, a:visited {
     margin-top: 20px;
 }
 
-a {
-    color: #d7db1c;
+
+#freq {
+    width: 10%;
+    margin: 0 auto;
 }
