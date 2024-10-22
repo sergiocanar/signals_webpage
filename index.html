@@ -27,17 +27,17 @@
         <div class="form-row">
             <div class="form-col-4">
                 <label for="freq">Frequency: </label>
-                <input type="range" id="freq" min="0" max="100" value="10" step="5" oninput="updateFreqValue(this.value)">
+                <input type="range" id="freq" min="0" max="100" value="10" step="5" oninput="updateECG()">
                 <span id="freqDisplay">10 Hz</span>
             </div>
             <div class="form-col-4">
                 <label for="exploreECG">Explore ECG: </label>
-                <input type="range" id="exploreECG" min="0" value="0" step="1" oninput="updateNDataValue(this.value)">
+                <input type="range" id="exploreECG" min="0" value="0" step="1" oninput="updateECG()">
                 <span id="nDataDisplay">0</span>
             </div>
             <div class="form-col-4">
                 <label for="windowSize">Window size (number of data): </label>
-                <input type="range" id="windowSize" min="100" value="0" step="1" oninput="updateWindowSizeValue(this.value)">
+                <input type="range" id="windowSize" min="100" value="0" step="1" oninput="updateECG()">
                 <span id="windowSizeDisplay">100</span>
             </div>
         </div>
