@@ -84,3 +84,18 @@ a:link, a:visited {
     color: #f7f7f7;
     text-decoration: none;
 }
+
+#ecg-container {
+    width: 100%; 
+    height: 400px;
+}
+
+#tachogran-container {
+    width: 100%;
+    height: 400px;
+    margin-top: 20px;
+}
+
+a {
+    color: #d7db1c;
+}
