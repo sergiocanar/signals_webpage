@@ -1,5 +1,6 @@
 let ecgSignal = [];
 let timeArray = [];
+let rrIntervals = [];
 
 function updateECG() {
     let freqVal = parseInt(document.getElementById('freq').value);
@@ -69,16 +70,16 @@ function detectPeaksInWindow(signal, start, end) {
 }
 
 // Detección de picos con ventanas deslizantes
-function detectPeaksWithSlidingWindow(signal, windowSize, step) {
-    const allPeaks = [];
+function detectPeaksWithSlidingWindow(signal, timeArray, windowSize, step) {
+    let allPeaks = [];
 
     for (let start = 0; start < signal.length - windowSize; start += step) {
-        const end = start + windowSize;
-        const peaks = detectPeaksInWindow(signal, start, end);
+        let end = start + windowSize;
+        let peaks = detectPeaksInWindow(signal, start, end);
         allPeaks.push(...peaks);
     }
 
-    return allPeaks;
+    return { allPeaks, tacoTimeArray: timeArray.slice(allPeaks[1]) };
 }
 
 // Funciones auxiliares para calcular media y desviación estándar
@@ -87,49 +88,34 @@ function mean(arr) {
 }
 
 function std(arr, meanVal) {
-    const variance = arr.reduce((sum, value) => sum + Math.pow(value - meanVal, 2), 0) / arr.length;
+    let variance = arr.reduce((sum, value) => sum + Math.pow(value - meanVal, 2), 0) / arr.length;
     return Math.sqrt(variance);
 }
 
 // Calcular los RR-intervalos
 function calculateRRIntervals(peaks, timeArray) {
-    const rr_intervals = [];
+    rrIntervals = [];
 
     for (let i = 1; i < peaks.length; i++) {
-        const rr = timeArray[peaks[i]] - timeArray[peaks[i - 1]];
+        let rr = timeArray[peaks[i]] - timeArray[peaks[i - 1]];
 
         // Asegúrate de que el intervalo RR no sea negativo
         if (rr > 0) {
-            rr_intervals.push(rr);
+            rrIntervals.push(rr);
         }
     }
 
-    return rr_intervals;
-}
-
-// Función para graficar el ECG usando Highcharts
-function plotECG() {
-    updateECG();
-    const peaks = detectPeaksWithSlidingWindow(ecgSignal, 463, 10); // Usar ventanas de tamaño 463 y paso 10
-    const rr_intervals = calculateRRIntervals(peaks, timeArray);
-    plotTachogram(rr_intervals);
+    return rrIntervals;
 }
 
 // Función para graficar el tachograma
-function plotTachogram(rr_intervals) {
+function plotTachogram(rrIntervals, timeArray) {
     Highcharts.chart('tachogram-container', {
         chart: { type: 'line' },
-        title: { text: 'Tachogram (RR Intervals)' },
-        xAxis: {
-            title: { text: 'Beat Number' },
-            min: 0,
-            allowDecimals: false
-        },
-        yAxis: { title: { text: 'RR Interval (seconds)' } },
-        series: [{
-            name: 'RR Interval',
-            data: rr_intervals.map((interval, index) => [index + 1, interval])
-        }]
+        title: { text: 'Tachogram' },
+        xAxis: { title: { text: 'Time (seconds)' }, categories: timeArray },
+        yAxis: { title: { text: 'RR-interval (seconds)' } },
+        series: [{ name: 'RR-interval', data: rrIntervals }]
     });
 }
 
@@ -145,7 +131,34 @@ function updateECGPlot(freq, nData, windowSize) {
         yAxis: { title: { text: 'Amplitude' } },
         series: [{ name: 'ECG Signal', data: signalWindow }]
     });
+    const data = detectPeaksWithSlidingWindow(ecgSignal, timeArray, windowSize, 10); // Usar ventanas de tamaño 463 y paso 10
+    rrIntervals = calculateRRIntervals(data.allPeaks, data.tacoTimeArray);
+    plotTachogram(rrIntervals, data.tacoTimeArray);
+}
+
+function calculateBPM() {
+    console.log("click");
+
+    if (rrIntervals.length > 0) {
+        const avgRRIntervals = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
+        const bpm = 60 / avgRRIntervals;
+
+        document.getElementById('bpm-result').innerText = "Tus latidos por minuto son: " + bpm.toFixed(2);
+        console.log(bpm);
+        if (bpm < 60) {
+            document.getElementById('alert').innerText = "Cuidado, posible bradicardia.";
+        } else if (bpm > 100) {
+            document.getElementById('alert').innerText = "Cuidado, posible taquicardia.";
+        } else {
+            document.getElementById('alert').innerText = "Estás dentro del rango normal.";
+        }
+    } else {
+        document.getElementById('alert').innerText = "No se encontraron suficientes picos para calcular los BPM.";
+    }
 }
 
 // Llama a plotECG al cargar la página
-document.addEventListener('DOMContentLoaded', plotECG);
+document.addEventListener('DOMContentLoaded', updateECG);
+
+let btnCalculateBPM = document.getElementById("calculateBPM");
+btnCalculateBPM.onclick = () => calculateBPM();
