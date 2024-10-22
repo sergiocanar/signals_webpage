@@ -263,4 +263,4 @@ let startPointSlider = document.getElementById("start-point");
 startPointSlider.oninput = () => updateECG();
 
 let windowSizeSlider = document.getElementById("window-size");
-startPointSlider.oninput = () => updateECG();
+windowSizeSlider.oninput = () => updateECG();
