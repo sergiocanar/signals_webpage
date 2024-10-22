@@ -122,7 +122,6 @@ function detectPeaksInWindow(start, end) {
  */
 function detectPeaksWithSlidingWindow(windowSize, step) {
     let allPeaks = [];
-    let ecgSignal = 0;
 
     for (let start = 0; start < ecgSignal.length - windowSize; start += step) {
         let end = start + windowSize;
