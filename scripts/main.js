@@ -233,12 +233,12 @@ function updatePlots(freq, startPoint, windowSize) {
  * @function
  */
 function calculateBPM() {
+    let alertView = document.getElementById('alert');
     if (rrIntervals.length > 0) {
         const avgRRIntervals = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
         const bpm = 60 / avgRRIntervals;
 
         document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
-        let alertView = document.getElementById('alert');
         if (bpm < 60) {
             alertView.innerText = "Alert! possible bradycardia.";
             alertView.style.color = "red";
@@ -250,7 +250,9 @@ function calculateBPM() {
             alertView.style.color = "green";
         }
     } else {
-        document.getElementById('alert').innerText = "Not enough peaks to calculate BPM.";
+        document.getElementById('bpm-result').innerText = "N/A";
+        alertView.innerText = "Not enough peaks to calculate BPM.";
+        alertView.style.color = "black";
     }
 }
 
