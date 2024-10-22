@@ -1,3 +1,6 @@
+let ecgSignal = [];
+let timeArray = [];
+
 function updateECG() {
     let freqVal = parseInt(document.getElementById('freq').value);
     let nDataVal = parseInt(document.getElementById('exploreECG').value);
@@ -5,7 +8,7 @@ function updateECG() {
     document.getElementById('freqDisplay').innerText = freqVal + " Hz";
     document.getElementById('nDataDisplay').innerText = nDataVal;
     document.getElementById('windowSizeDisplay').innerText = windowSizeVal;
-    plotECG(freqVal, nDataVal, windowSizeVal);  // Actualiza el gráfico cuando se mueve cualquier slider
+    updateECGPlot(freqVal, nDataVal, windowSizeVal);  // Actualiza el gráfico cuando se mueve cualquier slider
 }
 
 function setMaxSliderValues(nData) {
@@ -13,28 +16,27 @@ function setMaxSliderValues(nData) {
     document.getElementById('windowSize').max = nData;
 }
 
-function createECG() {
+function createECG(sampleRate) {
+    ecgSignal = [];
+    timeArray = [];
+
     const nData = 2000;
     const height = 200;
     const amplitude = height / 2;
     const start = 0
-    const sampleRate = parseInt(document.getElementById('freq').value);
     const timePerSample = 1 / sampleRate;
 
     const maxAmplitude = amplitude * (0.5 + 0.5 * 0.5);
     // const waveFrequency = 5;  // Por ejemplo, establecer la frecuencia de la señal a 5 Hz
-
-    const signal = [];
-
     setMaxSliderValues(nData);
     for (let i = 0; i < nData; i++) {
         // let t = i * timePerSample;
         let y = start + maxAmplitude * Math.sin((i / nData) * sampleRate * 2 * Math.PI);
-        signal.push(y);
+        ecgSignal.push(y);
     }
 
-    const timeArray = Array.from({ length: signal.length }, (_, i) => parseFloat((i * timePerSample).toFixed(2)));
-    return { timeArray: timeArray, signal };
+    timeArray = Array.from({ length: ecgSignal.length }, (_, i) => parseFloat((i * timePerSample).toFixed(2)));
+    console.log(timeArray);
 }
 
 // Función para detectar picos dentro de una ventana específica
@@ -106,19 +108,10 @@ function calculateRRIntervals(peaks, timeArray) {
 }
 
 // Función para graficar el ECG usando Highcharts
-function plotECG(freq, nData, windowSize) {
-    const data = createECG();
-    const peaks = detectPeaksWithSlidingWindow(data.signal, 463, 10); // Usar ventanas de tamaño 463 y paso 10
-    const rr_intervals = calculateRRIntervals(peaks, data.timeArray);
-
-    Highcharts.chart('ecg-container', {
-        chart: { type: 'line' },
-        title: { text: 'ECG Signal Plot' },
-        xAxis: { title: { text: 'Time (seconds)' }, min: 0, tickInterval: 0.1, categories: data.timeArray },
-        yAxis: { title: { text: 'Amplitude' } },
-        series: [{ name: 'ECG Signal', data: data.signal }]
-    });
-
+function plotECG() {
+    updateECG();
+    const peaks = detectPeaksWithSlidingWindow(ecgSignal, 463, 10); // Usar ventanas de tamaño 463 y paso 10
+    const rr_intervals = calculateRRIntervals(peaks, timeArray);
     plotTachogram(rr_intervals);
 }
 
@@ -140,32 +133,17 @@ function plotTachogram(rr_intervals) {
     });
 }
 
-function updateECGPlot() {
-    const windowSize = parseInt(document.getElementById('windowSize').value);
-    const sliderValue = parseInt(document.getElementById('exploreECG').value);
+function updateECGPlot(freq, nData, windowSize) {
+    createECG(freq);
+    const signalWindow = ecgSignal.slice(nData, nData + windowSize);
+    const timeWindow = timeArray.slice(nData, nData + windowSize);
 
-    const signalWindow = ecgSignal.slice(sliderValue, sliderValue + windowSize);
-    const timeWindow = timeArray.slice(sliderValue, sliderValue + windowSize);
-
-    Highcharts.chart('ecg-chart', {
-        chart: {
-            type: 'line'
-        },
-        title: {
-            text: 'ECG'
-        },
-        xAxis: {
-            categories: timeWindow
-        },
-        yAxis: {
-            title: {
-                text: 'Amplitude'
-            }
-        },
-        series: [{
-            name: 'ECG Signal',
-            data: signalWindow
-        }]
+    Highcharts.chart('ecg-container', {
+        chart: { type: 'line' },
+        title: { text: 'ECG Signal' },
+        xAxis: { title: { text: 'Time (seconds)' }, categories: timeWindow },
+        yAxis: { title: { text: 'Amplitude' } },
+        series: [{ name: 'ECG Signal', data: signalWindow }]
     });
 }
 
