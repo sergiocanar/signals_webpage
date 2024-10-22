@@ -1,35 +1,49 @@
-function updateValue(val) {
-    document.getElementById('value1Display').innerText = val + " Hz";
-    plotECG();  // Actualiza el gráfico cuando se mueve el slider
+let ecgSignal = [];
+let timeArray = [];
+let rrIntervals = [];
+
+function updateECG() {
+    let freqVal = parseInt(document.getElementById('freq').value);
+    let nDataVal = parseInt(document.getElementById('exploreECG').value);
+    let windowSizeVal = parseInt(document.getElementById('windowSize').value);
+    document.getElementById('freqDisplay').innerText = freqVal + " Hz";
+    document.getElementById('nDataDisplay').innerText = nDataVal;
+    document.getElementById('windowSizeDisplay').innerText = windowSizeVal;
+    updateECGPlot(freqVal, nDataVal, windowSizeVal);  // Actualiza el gráfico cuando se mueve cualquier slider
 }
 
-function createECG() {
-    const number_data = 2000;
+function setMaxSliderValues(nData) {
+    document.getElementById('exploreECG').max = nData;
+    document.getElementById('windowSize').max = nData;
+}
+
+function createECG(sampleRate) {
+    ecgSignal = [];
+    timeArray = [];
+
+    const nData = 2000;
     const height = 200;
     const amplitude = height / 2;
-    const inicio = 0 
-    const sampleRate = parseInt(document.getElementById('value1').value);
+    const start = 0
     const timePerSample = 1 / sampleRate;
 
     const maxAmplitude = amplitude * (0.5 + 0.5 * 0.5);
-    const waveFrequency = 5;  // Por ejemplo, establecer la frecuencia de la señal a 5 Hz
-
-    const signal = [];
-
-    for (let i = 0; i < number_data; i++) {
-        let t = i * timePerSample;
-        let y = inicio + maxAmplitude * Math.sin((i/ number_data)* sampleRate * 2 * Math.PI );
-        signal.push(y);
+    // const waveFrequency = 5;  // Por ejemplo, establecer la frecuencia de la señal a 5 Hz
+    setMaxSliderValues(nData);
+    for (let i = 0; i < nData; i++) {
+        // let t = i * timePerSample;
+        let y = start + maxAmplitude * Math.sin((i / nData) * sampleRate * 2 * Math.PI);
+        ecgSignal.push(y);
     }
 
-    const time_array = Array.from({ length: signal.length }, (_, i) => i * timePerSample);
-    return { time_array, signal };
+    timeArray = Array.from({ length: ecgSignal.length }, (_, i) => parseFloat((i * timePerSample).toFixed(2)));
+    console.log(timeArray);
 }
 
 // Función para detectar picos dentro de una ventana específica
 function detectPeaksInWindow(signal, start, end) {
     const peaks = [];
-    const window = signal.slice(start, end); 
+    const window = signal.slice(start, end);
     const peakValues = window.filter((val, i) =>
         i > 0 && i < window.length - 1 && val > window[i - 1] && val > window[i + 1]
     );
@@ -56,16 +70,16 @@ function detectPeaksInWindow(signal, start, end) {
 }
 
 // Detección de picos con ventanas deslizantes
-function detectPeaksWithSlidingWindow(signal, windowSize, step) {
-    const allPeaks = [];
+function detectPeaksWithSlidingWindow(signal, timeArray, windowSize, step) {
+    let allPeaks = [];
 
     for (let start = 0; start < signal.length - windowSize; start += step) {
-        const end = start + windowSize;
-        const peaks = detectPeaksInWindow(signal, start, end);
+        let end = start + windowSize;
+        let peaks = detectPeaksInWindow(signal, start, end);
         allPeaks.push(...peaks);
     }
 
-    return allPeaks;
+    return { allPeaks, tacoTimeArray: timeArray.slice(allPeaks[1]) };
 }
 
 // Funciones auxiliares para calcular media y desviación estándar
@@ -74,60 +88,77 @@ function mean(arr) {
 }
 
 function std(arr, meanVal) {
-    const variance = arr.reduce((sum, value) => sum + Math.pow(value - meanVal, 2), 0) / arr.length;
+    let variance = arr.reduce((sum, value) => sum + Math.pow(value - meanVal, 2), 0) / arr.length;
     return Math.sqrt(variance);
 }
 
 // Calcular los RR-intervalos
-function calculateRRIntervals(peaks, time_array) {
-    const rr_intervals = [];
+function calculateRRIntervals(peaks, timeArray) {
+    rrIntervals = [];
 
     for (let i = 1; i < peaks.length; i++) {
-        const rr = time_array[peaks[i]] - time_array[peaks[i - 1]];
+        let rr = timeArray[peaks[i]] - timeArray[peaks[i - 1]];
 
         // Asegúrate de que el intervalo RR no sea negativo
         if (rr > 0) {
-            rr_intervals.push(rr);
+            rrIntervals.push(rr);
         }
     }
 
-    return rr_intervals;
-}
-
-// Función para graficar el ECG usando Highcharts
-function plotECG() {
-    const data = createECG();
-    const peaks = detectPeaksWithSlidingWindow(data.signal, 463, 10); // Usar ventanas de tamaño 463 y paso 10
-    const rr_intervals = calculateRRIntervals(peaks, data.time_array);
-
-    Highcharts.chart('ecg-container', {
-        chart: { type: 'line' },
-        title: { text: 'ECG Signal Plot' },
-        xAxis: { title: { text: 'Time (seconds)' }, min: 0, tickInterval: 0.1, categories: data.time_array },
-        yAxis: { title: { text: 'Amplitude' } },
-        series: [{ name: 'ECG Signal', data: data.signal }]
-    });
-
-    plotTachogram(rr_intervals);
+    return rrIntervals;
 }
 
 // Función para graficar el tachograma
-function plotTachogram(rr_intervals) {
+function plotTachogram(rrIntervals, timeArray) {
     Highcharts.chart('tachogram-container', {
         chart: { type: 'line' },
-        title: { text: 'Tachogram (RR Intervals)' },
-        xAxis: { 
-            title: { text: 'Beat Number' },
-            min: 0,
-            allowDecimals: false
-        },
-        yAxis: { title: { text: 'RR Interval (seconds)' } },
-        series: [{ 
-            name: 'RR Interval', 
-            data: rr_intervals.map((interval, index) => [index + 1, interval]) 
-        }]
+        title: { text: 'Tachogram' },
+        xAxis: { title: { text: 'Time (seconds)' }, categories: timeArray },
+        yAxis: { title: { text: 'RR-interval (seconds)' } },
+        series: [{ name: 'RR-interval', data: rrIntervals }]
     });
 }
 
+function updateECGPlot(freq, nData, windowSize) {
+    createECG(freq);
+    const signalWindow = ecgSignal.slice(nData, nData + windowSize);
+    const timeWindow = timeArray.slice(nData, nData + windowSize);
+
+    Highcharts.chart('ecg-container', {
+        chart: { type: 'line' },
+        title: { text: 'ECG Signal' },
+        xAxis: { title: { text: 'Time (seconds)' }, categories: timeWindow },
+        yAxis: { title: { text: 'Amplitude' } },
+        series: [{ name: 'ECG Signal', data: signalWindow }]
+    });
+    const data = detectPeaksWithSlidingWindow(ecgSignal, timeArray, windowSize, 10); // Usar ventanas de tamaño 463 y paso 10
+    rrIntervals = calculateRRIntervals(data.allPeaks, data.tacoTimeArray);
+    plotTachogram(rrIntervals, data.tacoTimeArray);
+}
+
+function calculateBPM() {
+    console.log("click");
+
+    if (rrIntervals.length > 0) {
+        const avgRRIntervals = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
+        const bpm = 60 / avgRRIntervals;
+
+        document.getElementById('bpm-result').innerText = "Tus latidos por minuto son: " + bpm.toFixed(2);
+        console.log(bpm);
+        if (bpm < 60) {
+            document.getElementById('alert').innerText = "Cuidado, posible bradicardia.";
+        } else if (bpm > 100) {
+            document.getElementById('alert').innerText = "Cuidado, posible taquicardia.";
+        } else {
+            document.getElementById('alert').innerText = "Estás dentro del rango normal.";
+        }
+    } else {
+        document.getElementById('alert').innerText = "No se encontraron suficientes picos para calcular los BPM.";
+    }
+}
+
 // Llama a plotECG al cargar la página
-document.addEventListener('DOMContentLoaded', plotECG);
+document.addEventListener('DOMContentLoaded', updateECG);
+
+let btnCalculateBPM = document.getElementById("calculateBPM");
+btnCalculateBPM.onclick = () => calculateBPM();
