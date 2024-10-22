@@ -237,17 +237,20 @@ function calculateBPM() {
         const avgRRIntervals = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
         const bpm = 60 / avgRRIntervals;
 
-        document.getElementById('bpm-result').innerText = "Your BPM are: " + bpm.toFixed(2);
-        console.log(bpm);
+        document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
+        let alertView = document.getElementById('alert');
         if (bpm < 60) {
-            document.getElementById('alert').innerText = "Alert!, possible bradycardia.";
+            alertView.innerText = "Alert! possible bradycardia.";
+            alertView.style.color = "red";
         } else if (bpm > 100) {
-            document.getElementById('alert').innerText = "Alert°, possible tachycardia.";
+            alertView.innerText = "Alert! possible tachycardia.";
+            alertView.style.color = "red";
         } else {
-            document.getElementById('alert').innerText = "Your BPM is within the normal range.";
+            alertView.innerText = "Within the normal range.";
+            alertView.style.color = "green";
         }
     } else {
-        document.getElementById('alert').innerText = "Not enough peaks to calculate your BPM.";
+        document.getElementById('alert').innerText = "Not enough peaks to calculate BPM.";
     }
 }
 
