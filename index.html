@@ -14,17 +14,33 @@
 
 <body>
     <div class="container">
-
-        <h1 id="title">ECG Visualization</h1>
-        <h2 id="subtitle">Lab 4</h2>
-        <figure>
-            <img src="https://data.org/wp-content/uploads/2022/02/Universidad-de-los-Andes-975x377.png" 
-            alt="Universidad de los Andes" style="width: 10%">
-            <figcaption>Departamento de Ingenieria Biomedica</figcaption>
-        </figure>
-        <label for="freq">Frequency: </label>
-        <input type="range" id="freq" min="0" max="100" value="10" step="5" oninput="updateValue(this.value)">
-        <span id="freqDisplay">10 Hz</span>
+        <div class="row">
+            <h1 id="title">ECG Visualization</h1>
+            <h2 id="subtitle">Lab 4</h2>
+            <figure>
+                <img src="https://data.org/wp-content/uploads/2022/02/Universidad-de-los-Andes-975x377.png" 
+                alt="Universidad de los Andes" style="width: 10%">
+                <figcaption>Departamento de Ingenieria Biomedica</figcaption>
+                <hr>
+            </figure>
+        </div>
+        <div class="form-row">
+            <div class="form-col-4">
+                <label for="freq">Frequency: </label>
+                <input type="range" id="freq" min="0" max="100" value="10" step="5" oninput="updateFreqValue(this.value)">
+                <span id="freqDisplay">10 Hz</span>
+            </div>
+            <div class="form-col-4">
+                <label for="exploreECG">Explore ECG: </label>
+                <input type="range" id="exploreECG" min="0" value="0" step="1" oninput="updateNDataValue(this.value)">
+                <span id="nDataDisplay">0</span>
+            </div>
+            <div class="form-col-4">
+                <label for="windowSize">Window size (number of data): </label>
+                <input type="range" id="windowSize" min="100" value="0" step="1" oninput="updateWindowSizeValue(this.value)">
+                <span id="windowSizeDisplay">100</span>
+            </div>
+        </div>
         
         <div id="ecg-container"></div>
         <div id="tachogram-container"></div>
@@ -34,8 +50,8 @@
         <p>Authors: Sergio Andres Canar Lozano (202020383) and David Tobon Molina (202123804)</p>
         <p>GitHub Profiles: <a href="https://github.com/sergiocanar">sergiocanar</a> and 
         <a href="https://github.com/DavidTobonIBIO">DavidTobonIBIO</a></p>
-        <p>Source code: <a href="https://github.com/sergiocanar/singnals_webpage">
-        https://github.com/sergiocanar/singnals_webpage</a></p>
+        <p>Source code: <a href="https://github.com/sergiocanar/signals_webpage">
+        https://github.com/sergiocanar/signals_webpage</a></p>
     </footer>
 </body>
 

@@ -1,10 +1,24 @@
-function updateValue(val) {
+function updateFreqValue(val) {
     document.getElementById('freqDisplay').innerText = val + " Hz";
     plotECG();  // Actualiza el gráfico cuando se mueve el slider
 }
 
+function updateNDataValue(val) {
+    document.getElementById('nDataDisplay').innerText = val;
+    updateECGPlot();  // Actualiza el gráfico cuando se mueve el slider
+}
+
+function updateWindowSizeValue(val) {
+    document.getElementById('windowSizeDisplay').innerText = val;
+    updateECGPlot();  // Actualiza el gráfico cuando se mueve el slider
+}
+
 function createECG() {
-    const number_data = 2000;
+    const nData = 2000;
+    let maxData = document.getElementById('exploreECG');
+    maxData.max = nData;
+    let windowSize = document.getElementById('windowSize');
+    windowSize.max = nData;
     const height = 200;
     const amplitude = height / 2;
     const inicio = 0 
@@ -16,13 +30,14 @@ function createECG() {
 
     const signal = [];
 
-    for (let i = 0; i < number_data; i++) {
+    for (let i = 0; i < nData; i++) {
         let t = i * timePerSample;
-        let y = inicio + maxAmplitude * Math.sin((i/ number_data)* sampleRate * 2 * Math.PI );
+        let y = inicio + maxAmplitude * Math.sin((i/ nData)* sampleRate * 2 * Math.PI );
         signal.push(y);
     }
 
     const time_array = Array.from({ length: signal.length }, (_, i) => i * timePerSample);
+    console.log(time_array)
     return { time_array, signal };
 }
 
@@ -125,6 +140,35 @@ function plotTachogram(rr_intervals) {
         series: [{ 
             name: 'RR Interval', 
             data: rr_intervals.map((interval, index) => [index + 1, interval]) 
+        }]
+    });
+}
+
+function updateECGPlot() {
+    const windowSize = parseInt(document.getElementById('windowSize').value);
+    const sliderValue = parseInt(document.getElementById('exploreECG').value);
+
+    const signalWindow = ecgSignal.slice(sliderValue, sliderValue + windowSize);
+    const timeWindow = timeArray.slice(sliderValue, sliderValue + windowSize);
+
+    Highcharts.chart('ecg-chart', {
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: 'ECG'
+        },
+        xAxis: {
+            categories: timeWindow
+        },
+        yAxis: {
+            title: {
+                text: 'Amplitude'
+            }
+        },
+        series: [{
+            name: 'ECG Signal',
+            data: signalWindow
         }]
     });
 }

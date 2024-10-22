@@ -79,9 +79,12 @@ footer {
     overflow-y: auto; /* Enable scrolling if content exceeds the height */
 }
 
+a {
+    color: #d7db1c;
+}
 
 a:link, a:visited {
-    color: #f7f7f7;
+    color: #d4c2fc;
     text-decoration: none;
 }
 
@@ -96,6 +99,8 @@ a:link, a:visited {
     margin-top: 20px;
 }
 
-a {
-    color: #d7db1c;
+
+#freq {
+    width: 10%;
+    margin: 0 auto;
 }
