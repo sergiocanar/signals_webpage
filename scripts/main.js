@@ -17,14 +17,14 @@ let rrIntervals = [];
 function updateView() {
     // obtener los valores de los sliders
     let freqVal = parseInt(document.getElementById('freq').value);
-    let nDataVal = parseInt(document.getElementById('start-point').value);
+    let startPointVal = parseInt(document.getElementById('start-point').value);
     let windowSizeVal = parseInt(document.getElementById('window-size').value);
     // Actualizar la vista de los valores de los sliders
     document.getElementById('freq-display').innerText = freqVal + " Hz";
-    document.getElementById('start-point-display').innerText = nDataVal;
+    document.getElementById('start-point-display').innerText = startPointVal;
     document.getElementById('window-size-display').innerText = windowSizeVal;
     // Actualizar los gráficos
-    updatePlots(freqVal, nDataVal, windowSizeVal);  
+    updatePlots(freqVal, startPointVal, windowSizeVal);  
     // Calcula los latidos por minuto
     calculateBPM();
 }
@@ -194,7 +194,7 @@ function plotTachogram(timeArray) {
  * Actualiza las gráficas de ECG y el taquograma.
  *
  * @param {number} freq - Frecuencia de muestreo de la señal ECG.
- * @param {number} nData - Índice inicial de los datos a mostrar.
+ * @param {number} startPoint - Índice inicial de los datos a mostrar.
  * @param {number} windowSize - Tamaño de la ventana de datos a mostrar.
  *
  * @description
@@ -204,10 +204,10 @@ function plotTachogram(timeArray) {
  * Luego, detecta los picos en la señal ECG utilizando una ventana deslizante y calcula los intervalos RR.
  * Finalmente, grafica el taquograma utilizando los intervalos RR calculados.
  */
-function updatePlots(freq, nData, windowSize) {
+function updatePlots(freq, startPoint, windowSize) {
     createECG(freq);
-    let signalWindow = ecgSignal.slice(nData, nData + windowSize);
-    let timeWindow = timeArray.slice(nData, nData + windowSize);
+    let signalWindow = ecgSignal.slice(startPoint, startPoint + windowSize);
+    let timeWindow = timeArray.slice(startPoint, startPoint + windowSize);
 
     Highcharts.chart('ecg-container', {
         chart: { type: 'line' },
