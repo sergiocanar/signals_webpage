@@ -1,5 +1,5 @@
 function updateValue(val) {
-    document.getElementById('value1Display').innerText = val + " Hz";
+    document.getElementById('freqDisplay').innerText = val + " Hz";
     plotECG();  // Actualiza el gráfico cuando se mueve el slider
 }
 
@@ -8,7 +8,7 @@ function createECG() {
     const height = 200;
     const amplitude = height / 2;
     const inicio = 0 
-    const sampleRate = parseInt(document.getElementById('value1').value);
+    const sampleRate = parseInt(document.getElementById('freq').value);
     const timePerSample = 1 / sampleRate;
 
     const maxAmplitude = amplitude * (0.5 + 0.5 * 0.5);

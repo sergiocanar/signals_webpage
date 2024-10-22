@@ -13,20 +13,23 @@
 </head>
 
 <body>
-    <h1 id="title">ECG Visualization</h1>
-    <h2 id="subtitle">Lab 4</h2>
-    <figure>
-        <img src="https://data.org/wp-content/uploads/2022/02/Universidad-de-los-Andes-975x377.png" 
-        alt="Universidad de los Andes" style="width: 10%">
-        <figcaption>Departamento de Ingenieria Biomedica</figcaption>
-    </figure>
-    <label for="value1">Frequency: </label>
-    <input type="range" id="value1" min="0" max="100" value="10" step="5" oninput="updateValue(this.value)">
-    <span id="value1Display">10 Hz</span>
-    
-    <div id="ecg-container"></div>
-    <div id="tachogram-container"></div>
-    
+    <div class="container">
+
+        <h1 id="title">ECG Visualization</h1>
+        <h2 id="subtitle">Lab 4</h2>
+        <figure>
+            <img src="https://data.org/wp-content/uploads/2022/02/Universidad-de-los-Andes-975x377.png" 
+            alt="Universidad de los Andes" style="width: 10%">
+            <figcaption>Departamento de Ingenieria Biomedica</figcaption>
+        </figure>
+        <label for="freq">Frequency: </label>
+        <input type="range" id="freq" min="0" max="100" value="10" step="5" oninput="updateValue(this.value)">
+        <span id="freqDisplay">10 Hz</span>
+        
+        <div id="ecg-container"></div>
+        <div id="tachogram-container"></div>
+    </div>
+        
     <footer id="footer">
         <p>Authors: Sergio Andres Canar Lozano (202020383) and David Tobon Molina (202123804)</p>
         <p>GitHub Profiles: <a href="https://github.com/sergiocanar">sergiocanar</a> and 
