@@ -14,7 +14,7 @@ let rrIntervals = [];
  * 
  * @function
  */
-function updateECG() {
+function updateView() {
     // obtener los valores de los sliders
     let freqVal = parseInt(document.getElementById('freq').value);
     let nDataVal = parseInt(document.getElementById('start-point').value);
@@ -253,14 +253,14 @@ function calculateBPM() {
 }
 
 // Plotear la señal ECG al cargar la página
-document.addEventListener('DOMContentLoaded', updateECG);
+document.addEventListener('DOMContentLoaded', updateView);
 
 // Eventos de los sliders
 let freqSlider = document.getElementById("freq");
-freqSlider.oninput = () => updateECG();
+freqSlider.oninput = () => updateView();
 
 let startPointSlider = document.getElementById("start-point");
-startPointSlider.oninput = () => updateECG();
+startPointSlider.oninput = () => updateView();
 
 let windowSizeSlider = document.getElementById("window-size");
-windowSizeSlider.oninput = () => updateECG();
+windowSizeSlider.oninput = () => updateView();
