@@ -97,6 +97,7 @@ void loop() {{
 
     print(f"Arduino code has been generated and saved to {output_file}.")
 
+
 if __name__ == "__main__":
     HTML_FILE = "index.html"
     CSS_FILE = "styles.css"
