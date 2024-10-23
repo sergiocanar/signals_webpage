@@ -85,7 +85,7 @@ void loop() {{
 
     # Convert HTML to client.print() statements
     for line in html_content:
-        arduino_code += f'  client.print("{line.replace("\n", "\\\\n")}");\n'
+        arduino_code += f'  client.println("{line}");\n'
 
     arduino_code += """
     client.println();
