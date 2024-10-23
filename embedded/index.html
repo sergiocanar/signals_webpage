@@ -340,25 +340,25 @@ function calculateBPM() {
             alertView.innerText = "Alert! possible bradycardia.";
             alertView.style.color = "red";
             moreInfoButton.onclick = () => {
-                alert(`La bradicardia es una condición en la que el corazón late más despacio de lo normal. Puede ser grave en algunos casos y requerir tratamiento.
+                alert(`Bradycardia is a condition where the heart beats slower than normal. It can be serious in some cases and may require treatment.
 
-                    Bradicardia leve: 50-60 bpm.
+                    Mild bradycardia: 50-60 bpm.
 
-                    Bradicardia moderada: 40-50 bpm.
-                    
-                    Bradicardia severa: Menos de 40 bpm.`);
+                    Moderate bradycardia: 40-50 bpm.
+
+                    Severe bradycardia: Less than 40 bpm.`);
             };
         } else if (bpm > 100) {
             alertView.innerText = "Alert! possible tachycardia.";
             alertView.style.color = "red";
             moreInfoButton.onclick = () => {
-                alert(`La taquicardia es una condición en la que el corazón late más rápido de lo normal. Es importante controlarla, ya que puede derivar en problemas más serios.
+                alert(`Tachycardia is a condition where the heart beats faster than normal. It is important to monitor it as it can lead to more serious problems.
 
-                    Taquicardia leve: 100-120 bpm.
+                    Mild tachycardia: 100-120 bpm.
 
-                    Taquicardia moderada: 120-150 bpm.
+                    Moderate tachycardia: 120-150 bpm.
 
-                    Taquicardia grave: Más de 150 bpm.`);	
+                    Severe tachycardia: More than 150 bpm.`);
             };
         } else {
             alertView.innerText = "Within the normal range.";
