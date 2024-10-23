@@ -97,19 +97,19 @@ void loop() {{
 
     print(f"Arduino code has been generated and saved to {output_file}.")
 
+if __name__ == "__main__":
+    HTML_FILE = "index.html"
+    CSS_FILE = "styles.css"
+    JS_FILE = os.path.join("scripts", "main.js")
+    os.makedirs("embedded", exist_ok=True)
+    EMBEDDED_HTML_PATH = os.path.join("embedded", "index.html")
+    embed_files(HTML_FILE, CSS_FILE, JS_FILE, EMBEDDED_HTML_PATH)
 
-HTML_FILE = "index.html"
-CSS_FILE = "styles.css"
-JS_FILE = os.path.join("scripts", "main.js")
-os.makedirs("embedded", exist_ok=True)
-EMBEDDED_HTML_PATH = os.path.join("embedded", "index.html")
-embed_files(HTML_FILE, CSS_FILE, JS_FILE, EMBEDDED_HTML_PATH)
+    ARDUINO_FILE = "web_server.ino"
+    ARDUINO_DIR = ARDUINO_FILE.split(".")[0]
+    os.makedirs(ARDUINO_DIR, exist_ok=True)
+    ARDUINO_PATH = os.path.join(ARDUINO_DIR, ARDUINO_FILE)
 
-ARDUINO_FILE = "web_server.ino"
-ARDUINO_DIR = ARDUINO_FILE.split(".")[0]
-os.makedirs(ARDUINO_DIR, exist_ok=True)
-ARDUINO_PATH = os.path.join(ARDUINO_DIR, ARDUINO_FILE)
-
-SSID = "ColdPalmer"
-PASSWORD = "david4567"
-generate_arduino_from_html(EMBEDDED_HTML_PATH, ARDUINO_PATH, SSID, PASSWORD)
+    SSID = "ColdPalmer"
+    PASSWORD = "david4567"
+    generate_arduino_from_html(EMBEDDED_HTML_PATH, ARDUINO_PATH, SSID, PASSWORD)
