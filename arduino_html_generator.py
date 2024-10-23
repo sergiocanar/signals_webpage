@@ -102,14 +102,14 @@ HTML_FILE = "index.html"
 CSS_FILE = "styles.css"
 JS_FILE = os.path.join("scripts", "main.js")
 os.makedirs("embedded", exist_ok=True)
-embedded_html_path = os.path.join("embedded", "index.html")
-embed_files(HTML_FILE, CSS_FILE, JS_FILE, embedded_html_path)
+EMBEDDED_HTML_PATH = os.path.join("embedded", "index.html")
+embed_files(HTML_FILE, CSS_FILE, JS_FILE, EMBEDDED_HTML_PATH)
 
-arduino_output_file = "web_server.ino"
-arduino_ouput_dir = arduino_output_file.split(".")[0]
-os.makedirs(arduino_ouput_dir, exist_ok=True)
-arduino_output_path = os.path.join(arduino_ouput_dir, arduino_output_file)
+ARDUINO_FILE = "web_server.ino"
+ARDUINO_DIR = ARDUINO_FILE.split(".")[0]
+os.makedirs(ARDUINO_DIR, exist_ok=True)
+ARDUINO_PATH = os.path.join(ARDUINO_DIR, ARDUINO_FILE)
 
 SSID = "ColdPalmer"
 PASSWORD = "david4567"
-generate_arduino_from_html(embedded_html_path, arduino_output_path, SSID, PASSWORD)
+generate_arduino_from_html(EMBEDDED_HTML_PATH, ARDUINO_PATH, SSID, PASSWORD)
