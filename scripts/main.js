@@ -234,27 +234,49 @@ function updatePlots(freq, startPoint, windowSize) {
  */
 function calculateBPM() {
     let alertView = document.getElementById('alert');
+    let moreInfoButton = document.getElementById('more-info-button'); // Obtén el botón
     if (rrIntervals.length > 0) {
         const avgRRIntervals = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
         const bpm = 60 / avgRRIntervals;
 
         document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
+        
+        // Mostrar botón de "Conocer más sobre mi estado"
+        moreInfoButton.style.display = "block"; 
+
         if (bpm < 60) {
             alertView.innerText = "Alert! possible bradycardia.";
             alertView.style.color = "red";
+            moreInfoButton.onclick = function() {
+                alert("La bradicardia es una condición en la que el corazón late más despacio de lo normal. Puede ser grave en algunos casos y requerir tratamiento.\n" + "\n" + 
+                      "Bradicardia leve: 50-60 bpm.\n" +"\n" + 
+                      "Bradicardia moderada: 40-50 bpm.\n" +"\n" + 
+                      "Bradicardia severa: Menos de 40 bpm.");
+            };
         } else if (bpm > 100) {
             alertView.innerText = "Alert! possible tachycardia.";
             alertView.style.color = "red";
+            moreInfoButton.onclick = function() {
+                alert("La taquicardia es una condición en la que el corazón late más rápido de lo normal. Es importante controlarla, ya que puede derivar en problemas más serios.\n" + "\n" + 
+                      "Taquicardia leve: 100-120 bpm.\n" + "\n" + 
+                      "Taquicardia moderada: 120-150 bpm.\n" + "\n" + 
+                      "Taquicardia grave: Más de 150 bpm.");
+            };
         } else {
             alertView.innerText = "Within the normal range.";
             alertView.style.color = "green";
+            moreInfoButton.onclick = function() {
+                alert("Tu frecuencia cardíaca está dentro de los niveles normales. ¡Sigue así!");
+            };
         }
     } else {
         document.getElementById('bpm-result').innerText = "N/A";
         alertView.innerText = "Not enough peaks to calculate BPM.";
         alertView.style.color = "black";
+        moreInfoButton.style.display = "none"; // Ocultar botón si no hay BPM calculado
     }
 }
+
 
 // Plotear la señal ECG al cargar la página
 document.addEventListener('DOMContentLoaded', updateView);

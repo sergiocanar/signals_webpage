@@ -9,38 +9,38 @@ const char* password = "david4567";  // WiFi Password
 WiFiServer server(80);
 
 void setup() {
-  Serial.begin(9600);
-  delay(10);
-  
-  // Connecting to WiFi
-  Serial.print("Connecting to ");
-  Serial.println(ssid); 
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+    Serial.begin(9600);
+    delay(10);
+
+    // Connecting to WiFi
+    Serial.print("Connecting to ");
+    Serial.println(ssid); 
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("WiFi connected");
-  server.begin();
-  Serial.println("Server started");
-  Serial.print("Use this URL to connect: http://");
-  Serial.println(WiFi.localIP());
+    }
+    Serial.println("");
+    Serial.println("WiFi connected");
+    server.begin();
+    Serial.println("Server started");
+    Serial.print("Use this URL to connect: http://");
+    Serial.println(WiFi.localIP());
 }
 
 void loop() {
-  WiFiClient client = server.available();
-  if (!client) {
+    WiFiClient client = server.available();
+    if (!client) {
     return;
-  }
-  
-  Serial.println("New client connected");
-  
-  // Send headers
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println("Connection: close");
-  client.println();
+    }
+
+    Serial.println("New client connected");
+
+    // Send headers
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("Connection: close");
+    client.println();
 
   // Send HTML content
   client.print("<!DOCTYPE html>");
@@ -50,7 +50,7 @@ void loop() {
   client.print("    <meta charset='UTF-8'>");
   client.print("    <meta name='viewport' content='width=device-width'>");
   client.print("    <meta http-equiv='X-UA-Compatible' content='ie=edge'>");
-  client.print("    <link rel='icon' href='./images/favicon.ico'>");
+  client.print("    <link rel='icon' href='https://github.com/sergiocanar/signals_webpage/blob/main/images/favicon.ico'>");
   client.print("    <style>");
   client.print("/* General */");
   client.print("html, body {");
@@ -407,5 +407,5 @@ void loop() {
   client.print("");
   client.print("</html>");
 
-  client.println();
+    client.println();
 }

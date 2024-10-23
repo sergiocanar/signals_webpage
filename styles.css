@@ -45,7 +45,7 @@ h2 {
 
 
 /* Button */
-button {
+#more-info-button {
     padding: 10px 20px;
     font-size: 1em;
     color: #f7f7f7;
@@ -54,9 +54,11 @@ button {
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
+    display:none;
+    margin: auto;
 }
 
-button:hover {
+#more-info-button:hover {
     background-color: #0056b3;
 }
 
