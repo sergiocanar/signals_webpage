@@ -234,20 +234,19 @@ function updatePlots(freq, startPoint, windowSize) {
  */
 function calculateBPM() {
     let alertView = document.getElementById('alert');
-    let moreInfoButton = document.getElementById('more-info-button'); // Obtén el botón
+    let moreInfoButton = document.getElementById('more-info-button');
     if (rrIntervals.length > 0) {
         const avgRRIntervals = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
         const bpm = 60 / avgRRIntervals;
 
         document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
         
-        // Mostrar botón de "Conocer más sobre mi estado"
         moreInfoButton.style.display = "block"; 
 
         if (bpm < 60) {
             alertView.innerText = "Alert! possible bradycardia.";
             alertView.style.color = "red";
-            moreInfoButton.onclick = function() {
+            moreInfoButton.onclick = () => {
                 alert("La bradicardia es una condición en la que el corazón late más despacio de lo normal. Puede ser grave en algunos casos y requerir tratamiento.\n" + "\n" + 
                       "Bradicardia leve: 50-60 bpm.\n" +"\n" + 
                       "Bradicardia moderada: 40-50 bpm.\n" +"\n" + 
@@ -256,7 +255,7 @@ function calculateBPM() {
         } else if (bpm > 100) {
             alertView.innerText = "Alert! possible tachycardia.";
             alertView.style.color = "red";
-            moreInfoButton.onclick = function() {
+            moreInfoButton.onclick = () => {
                 alert("La taquicardia es una condición en la que el corazón late más rápido de lo normal. Es importante controlarla, ya que puede derivar en problemas más serios.\n" + "\n" + 
                       "Taquicardia leve: 100-120 bpm.\n" + "\n" + 
                       "Taquicardia moderada: 120-150 bpm.\n" + "\n" + 
@@ -265,7 +264,7 @@ function calculateBPM() {
         } else {
             alertView.innerText = "Within the normal range.";
             alertView.style.color = "green";
-            moreInfoButton.onclick = function() {
+            moreInfoButton.onclick = () => {
                 alert("Tu frecuencia cardíaca está dentro de los niveles normales. ¡Sigue así!");
             };
         }

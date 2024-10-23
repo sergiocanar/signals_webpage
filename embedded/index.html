@@ -54,19 +54,21 @@ h2 {
 
 
 /* Button */
-button {
+#more-info-button {
     padding: 10px 20px;
     font-size: 1em;
     color: #f7f7f7;
-    background-color: #14248A;
+    background-color: #28262C;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
+    display:none;
+    margin: auto;
 }
 
-button:hover {
-    background-color: #0056b3;
+#more-info-button:hover {
+    background-color: #14248A;
 }
 
 /* List */
@@ -157,6 +159,8 @@ a:link, a:visited {
                 <div id="bpm-container">
                     <h3 id="bpm-result"></h3>
                     <h3 id="alert"></h3>
+                    <button id="more-info-button" class="btn btn-primary">Conocer mÃ¡s sobre mi estado</button>
+                    <div style="height: 50px;"></div>
                 </div>
             </div>
         </div>
@@ -323,27 +327,48 @@ function updatePlots(freq, startPoint, windowSize) {
 
 function calculateBPM() {
     let alertView = document.getElementById('alert');
+    let moreInfoButton = document.getElementById('more-info-button');
     if (rrIntervals.length > 0) {
         const avgRRIntervals = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
         const bpm = 60 / avgRRIntervals;
 
         document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
+        
+        moreInfoButton.style.display = "block"; 
+
         if (bpm < 60) {
             alertView.innerText = "Alert! possible bradycardia.";
             alertView.style.color = "red";
+            moreInfoButton.onclick = () => {
+                alert("La bradicardia es una condición en la que el corazón late más despacio de lo normal. Puede ser grave en algunos casos y requerir tratamiento.\n" + "\n" + 
+                      "Bradicardia leve: 50-60 bpm.\n" +"\n" + 
+                      "Bradicardia moderada: 40-50 bpm.\n" +"\n" + 
+                      "Bradicardia severa: Menos de 40 bpm.");
+            };
         } else if (bpm > 100) {
             alertView.innerText = "Alert! possible tachycardia.";
             alertView.style.color = "red";
+            moreInfoButton.onclick = () => {
+                alert("La taquicardia es una condición en la que el corazón late más rápido de lo normal. Es importante controlarla, ya que puede derivar en problemas más serios.\n" + "\n" + 
+                      "Taquicardia leve: 100-120 bpm.\n" + "\n" + 
+                      "Taquicardia moderada: 120-150 bpm.\n" + "\n" + 
+                      "Taquicardia grave: Más de 150 bpm.");
+            };
         } else {
             alertView.innerText = "Within the normal range.";
             alertView.style.color = "green";
+            moreInfoButton.onclick = () => {
+                alert("Tu frecuencia cardíaca está dentro de los niveles normales. ¡Sigue así!");
+            };
         }
     } else {
         document.getElementById('bpm-result').innerText = "N/A";
         alertView.innerText = "Not enough peaks to calculate BPM.";
         alertView.style.color = "black";
+        moreInfoButton.style.display = "none"; 
     }
 }
+
 
 
 document.addEventListener('DOMContentLoaded', updateView);

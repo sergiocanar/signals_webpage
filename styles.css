@@ -49,7 +49,7 @@ h2 {
     padding: 10px 20px;
     font-size: 1em;
     color: #f7f7f7;
-    background-color: #14248A;
+    background-color: #28262C;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -59,7 +59,7 @@ h2 {
 }
 
 #more-info-button:hover {
-    background-color: #0056b3;
+    background-color: #14248A;
 }
 
 /* List */
