@@ -508,7 +508,8 @@ void loop() {
   client.println("            (202020383),");
   client.println("            <a href='https://github.com/DavidTobonIBIO' style='font-size: 18px;'>David Tobon Molina</a> (202123804),");
   client.println("            <a href='https://github.com/msalcedog' style='font-size: 18px;'>Martin Salcedo</a> (202123644),");
-  client.println("            and Wilman Sanchez (202116779)");
+  client.println("            and");
+  client.println("            <a href='https://github.com/wilmansh' style='font-size: 18px;'>Wilman Sanchez</a> (202116779) ");
   client.println("        </p>");
   client.println("        <p style='font-size: 18px;text-align: center;'>");
   client.println("            Source code:");
