@@ -5,33 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" href="https://github.com/sergiocanar/signals_webpage/blob/main/images/favicon.ico">
+    <link rel="icon" href="./images/favicon.ico">
     <style>
-/* General */
 html, body {
-    height: 100%;  /* Ensure full height of the viewport */
+    height: 100%;
     margin: 0;
     padding: 0;
-    background-color: #F9F5FF;
+    background-color: #ffffff;
     font-family: Arial, sans-serif;
-    text-align: center; /* Center all text horizontally */
+    text-align: center;
     display: flex;
     flex-direction: column;
+    font-size: 20px;
 }
 
 .container {
-    flex: 1; /* This allows the container to grow and fill the available space */
-    padding-bottom: 60px; /* Adjust this to match the footer height */
+    flex: 1;
+    padding-bottom: 60px;
 }
 
-/* Header */
 header {
     background-color: #28262C;
     color: #F9F5FF;
     padding: 20px 0;
 }
 
-/* Sections */
 section {
     padding: 20px;
     margin: 20px;
@@ -41,8 +39,8 @@ section {
 }
 
 h1 {
-    margin: 0;
-    font-size: 2em;
+    margin: 50px;
+    font-size: 4em;
     color: #28262C;
 }
 
@@ -52,26 +50,21 @@ h2 {
     color: #28262C;
 }
 
-
-/* Button */
-#more-info-button {
-    padding: 10px 20px;
-    font-size: 1em;
-    color: #f7f7f7;
-    background-color: #28262C;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-    display:none;
-    margin: auto;
+h3 {
+    font-size: 15px;
 }
 
-#more-info-button:hover {
-    background-color: #14248A;
+h4 {
+    text-align: left;
+    font-size: 10px;
 }
 
-/* List */
+p {
+    text-align: justify;
+    font-size: 25px;
+}
+
+
 ul {
     list-style-type: none;
     padding: 0;
@@ -82,21 +75,35 @@ li {
     font-size: 16px;
 }
 
-/* Footer */
+ol {
+    list-style-type: decimal;
+    padding-left: 20px;
+    text-align: left;
+    margin: 0;    
+}
+
+ol li {
+    margin-bottom: 10px;
+    text-decoration: underline;
+    font-size: 25px; 
+}
+
+li p {
+    margin: 0;
+}
+
 #footer {
-    position: fixed; /* Keep footer fixed at the bottom */
-    bottom: 0;
-    width: 100%; /* Full width */
+    position: relative;
+    width: 100%;
     background-color: #28262C;
     color: white;
-    padding: 10px;
     text-align: center;
-    z-index: 10; /* Make sure it's above other content */
-    overflow-y: auto; /* Enable scrolling if content exceeds the height */
+    font-size: 5px;
 }
 
 a {
     color: #d7db1c;
+    font-size: 10px;
 }
 
 a:link, a:visited {
@@ -107,76 +114,363 @@ a:link, a:visited {
 #ecg-container {
     width: 100%; 
     height: 400px;
+    margin-bottom: 5%;
 }
 
 #tachogran-container {
     width: 100%;
-    height: 400px;
-    margin-top: 20px;
+    height: 500px;
+    margin-bottom: 100%;    
+    padding: 100px;
 }
-
 
 #freq {
     width: 10%;
-    margin: 0 auto;
+    margin: auto;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.popup-content {
+    background-color: #ffffff;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+}
+
+.btn-primary {
+    background-color: #14248A !important;
+    border-color: #14248A !important;
+    margin-top: 20px;
+    font-size: 10px;
 }
 </style>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://code.highcharts.com/highcharts.js"></script>
 </head>
 
 <body>
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
-            <h1 id="title">ECG Visualization</h1>
-            <h2 id="subtitle">Lab 4</h2>
-            <figure>
-                <img class="img-fluid" src="https://data.org/wp-content/uploads/2022/02/Universidad-de-los-Andes-650x251.png" 
-                alt="Universidad de los Andes" style="width: 10%">
-                <figcaption>Departamento de Ingenieria Biomedica</figcaption>
-                <hr>
-            </figure>
-        </div>
-        <div class="row">
-            <div class="col-6">
-                <div>
-                    <label for="freq">Frequency: </label>
-                    <input type="range" id="freq" min="0" max="100" value="10" step="5">
-                    <span id="freq-display">10 Hz</span>
-                </div>
-                <div>
-                    <label for="start-point">Explore ECG: </label>
-                    <input type="range" id="start-point" min="0" value="0" step="1">
-                    <span id="start-point-display">0</span>
-                </div>
-                <div>
-                    <label for="window-size">Window size (number of data): </label>
-                    <input type="range" id="window-size" min="100" value="1" step="1">
-                    <span id="window-size-display">100</span>
+            <div class="col-4">
+                <figure style="position: absolute; top: 20px; right:60%">
+                    <img class="img-fluid" src="./images/ibio_n.png" alt="Universidad de los Andes" style="width: 70%;">
+                </figure>
+            </div>
+            <div class="col-4">
+                <figure
+                    style="position: relative; top: 20px; display: flex; flex-direction: column; align-items: center; margin: 0 auto;">
+                    <img class="img-fluid" src="./images/3_copy.png" alt="Descripción de la imagen"
+                        style="width: 50%; margin-bottom: 3%;">
+                </figure>
+            </div>
+            <div class="col-4">
+                <button class="btn btn-primary" onclick="showPopup()">
+                    ¡Descubre más sobre CardioHub!<br>
+                    <span style="display: block; text-indent: 20px;">Monitoreo inteligente para atletas en
+                        evolución.</span>
+                </button>
+            </div>
+            <div id="popup" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup()">&times;</span>
+                    <h2>CardioHub: Monitoreo inteligente para atletas en evolución.</h2>
+                    <figure style="position: relative; align-items: center; margin: 0 auto;">
+                        <img class="img-fluid" src="./images/3_copy.png" alt="Descripción de la imagen"
+                            style="width: 10%; ">
+                    </figure>
+                    <h4>Sobre las arritmias y la problemática actual: </h4>
+                    <p>La práctica deportiva de alto rendimiento se ha asociado en los últimos años con cardiomiopatías,
+                        arritmias ventriculares y enfermedades coronarias, subrayando la importancia de una vigilancia
+                        constante
+                        tanto durante el ejercicio como en la fase de recuperación [1]. Factores como la deshidratación,
+                        alteraciones electrolíticas, estrés fisiológico y fatiga muscular incrementan la susceptibilidad
+                        de los
+                        atletas a problemas cardíacos, elevando el riesgo de muerte súbita cardíaca (MSC),
+                        particularmente en
+                        aquellos con afecciones subyacentes no diagnosticadas, como la cardiomiopatía hipertrófica [2].
+                        A esto
+                        se le suma que la incidencia de MSC es más alta durante o inmediatamente después del ejercicio,
+                        lo que
+                        refuerza la necesidad de soluciones tecnológicas para monitorear en tiempo real la actividad
+                        cardíaca,
+                        alertando a los deportistas y entrenadores sobre posibles anormalidades que pongan en peligro la
+                        vida
+                        [3]. Dentro de las opciones existentes para llevar a cabo un monitoreo constante, el uso de
+                        electrocardiogramas (ECG) resulta esencial, ya que permite medir la actividad eléctrica del
+                        corazón y
+                        detectar arritmias y anomalías en la conducción [4].
+                        El proyecto ha sido impulsado por varios incidentes notables en el ámbito deportivo que han
+                        subrayado la
+                        necesidad urgente de mejorar las herramientas de monitoreo cardíaco para los atletas. Uno de los
+                        casos
+                        más recientes y reconocidos es el del futbolista Sergio Agüero, quien en 2021 sufrió una
+                        arritmia
+                        durante un partido, lo que lo obligó a retirarse del fútbol profesional. Este caso no solo
+                        demostró las
+                        posibles consecuencias de una arritmia no diagnosticada a tiempo, sino que también reveló la
+                        necesidad
+                        de un monitoreo más riguroso durante la actividad deportiva. Otro ejemplo es el del jugador de
+                        fútbol
+                        uruguayo Juan Izquierdo, quien falleció a causa de un paro cardiorrespiratorio relacionado con
+                        una
+                        arritmia mientras entrenaba [5]. Las circunstancias y problemática del monitoreo cardíaco se
+                        extienden a
+                        otras disciplinas del deporte, ejemplo de esto es el caso del triatleta sudafricano Richard
+                        Murray,
+                        quien fue diagnosticado con fibrilación auricular en 2021, lo que limitó su rendimiento en esta
+                        disciplina. Desde entonces, ha tenido que adaptar su entrenamiento y estilo de vida para
+                        gestionar la
+                        afección [6].
+                    </p>
+                    <figure style="position: relative; align-items: center; margin: 0 auto;">
+                        <img class="img-fluid" src="./images/Imagen_inv.png" alt="Descripción de la imagen"
+                            style="width: 70%; ">
+                    </figure>
+                    <h4>Datos estadísticos sobre las arritmias, un problema común en atletas de alto rendimiento: </h4>
+                    <p>En cuanto a los datos estadísticos, la arritmia cardiaca tiene una prevalencia global del 1.5% al
+                        5%,
+                        siendo la fibrilación auricular (FA) su forma más común [7]. En Colombia, se estima que entre el
+                        año
+                        2013 y 2017, 87 de cada 100,000 habitantes padecían de FA, donde este valor incrementaba a 150
+                        en
+                        regiones centrales del país [8]. En lo que respecta a los deportistas, se estima que 1 de cada
+                        59,452
+                        deportistas sufre un paro cardiaco asociado a una arritmia cardiaca, lo que representa 1.7 casos
+                        por
+                        cada 100,000 atletas [9]. Las estadísticas epidemiológicas también han revelado el alcance del
+                        problema.
+                        Investigaciones recientes han mostrado que el 12.9% de los corredores de maratón experimentaron
+                        arritmias ventriculares durante la carrera [10]. Dichos escenarios muestran el riesgo a la salud
+                        y la
+                        vida al que pueden llegar a estar expuestos los atletas, además de generar dudas sobre la
+                        capacidad
+                        actual de los dispositivos de monitoreo para detectar arritmias de manera oportuna durante el
+                        ejercicio
+                        intenso.
+                    </p>
+                    <h4>Principales causas que contribuyen al desarrollo de la fisiopatología: </h4>
+                    <ol>
+                        <li>Suplementos deportivos</li>
+                        <p>El uso de suplementos deportivos, especialmente esteroides anaeróbicos, está asociado con un
+                            mayor
+                            riesgo de FA en atletas jóvenes. Estos productos pueden alterar los mecanismos cardíacos
+                            normales,
+                            predisponiendo al desarrollo de arritmias [11] </p>
+                        <li>Ectopia auricular</li>
+                        <p>La FA en deportistas también puede ser provocada por descargas ectópicas focales en las venas
+                            pulmonares. Estas descargas son el resultado de un aumento en la actividad simpática debido
+                            al
+                            ejercicio intenso, lo que puede alterar el ritmo cardíaco normal [11]</p>
+                        <li>Inflamación y fibrosis</li>
+                        <p>El ejercicio excesivo y el entrenamiento intenso pueden causar inflamación sistémica crónica,
+                            manifestada en niveles elevados de proteína C-reactiva. Este proceso inflamatorio, junto con
+                            el
+                            desarrollo de fibrosis en el tejido cardíaco, crea un ambiente propicio para la aparición de
+                            FA, ya
+                            que altera la estructura y función normal del corazón [11]</p>
+                        <li>Desequilibrio electrolítico</li>
+                        <p>El entrenamiento de alta intensidad puede generar cambios significativos en la dinámica de
+                            fluidos
+                            del cuerpo, lo que conduce a desequilibrios electrolíticos. Estos desequilibrios, como la
+                            deshidratación extrema, pueden alterar la función cardíaca y favorecer el desarrollo de FA
+                            en los
+                            atletas [11].</p>
+                    </ol>
+                    <h4> CardioHub como wereable, su relevancia para el monitoreo de arritmias en atletas: </h4>
+                    <p>El uso de un dispositivo wearable como CardioHub para monitorear en tiempo real la actividad
+                        eléctrica
+                        del corazón, es crucial para prevenir complicaciones graves en los deportistas. dispositivos
+                        permiten la
+                        detección temprana de arritmias y proporcionan información precisa sobre el estado cardíaco
+                        durante el
+                        ejercicio intenso y la recuperación, ayudando a prevenir la muerte súbita cardíaca (MSC). Al
+                        proporcionar alertas en tiempo real sobre irregularidades cardíacas, estos wearables permiten a
+                        los
+                        entrenadores y médicos tomar decisiones rápidas y evitar que las condiciones no diagnosticadas
+                        progresen
+                        hacia situaciones críticas [12]. Además, el monitoreo continuo ayuda a ajustar las rutinas de
+                        entrenamiento de los atletas para optimizar su salud y rendimiento sin comprometer su bienestar
+                        cardíaco
+                        [13].
+                    </p>
+                    <p
+                        style="font-size: 20px; text-align: center; font-style: italic; font-weight: 550; color: #316bd6;">
+                        CardioHub proporciona una solución innovadora para salvaguardar la salud de los atletas mientras
+                        se
+                        esfuerzan por alcanzar su máximo rendimiento. La clave está en la prevención, y el monitoreo
+                        continuo es
+                        la herramienta que garantiza que los corazones de los deportistas sigan latiendo con seguridad y
+                        fortaleza.</p>
+
+                    <figure style="position: relative; align-items: center; margin: 0 auto;">
+                        <img class="img-fluid" src="./images/Imagen4.jpg" alt="Descripción de la imagen"
+                            style="width: 30%; ">
+                    </figure>
+
+                    <h4>Referencias</h4>
+                    <ol>[1] S. Fyyaz y M. Papadakis, “Arrhythmogenesis of Sports: Myth or Reality?” Arrhythm
+                        Electrophysiol Rev,
+                        vol. 11, e05, abr. de 2022. DOI: 10.15420/aer.2021.68.</ol>
+                    <ol>[2] P. Rao, D. R. Seshadri y J. J. Hsu, “Current and potential applications of wearables in
+                        sports
+                        cardiology,” Curr. Treat. Options Cardiovasc. Med., vol. 23, n.o 10, oct. de 2021, Accessed Sep.
+                        10,
+                        2024. direccion: https://doi. ´ org/10.1007/s11936-021-00942-1.</ol>
+                    <ol>[3] R. Gajda, J. Gajda, M. Czuba, B. Knechtle y W. Drygas, “Sports heart monitors as reliable
+                        diagnostic
+                        tools for training control and detecting arrhythmias in professional and leisure-time endurance
+                        athletes: An expert consensus statement,” Sports Med., oct. de 2023, Accessed Sep. 10, 2024.
+                        direccion:
+                        https://doi.org/10. ´ 1007/s40279-023-01948-4.</ol>
+                    <ol>[4] D. G. Grazioli, Arritmia ventricular y fibrosis miocardi- ´ ca en atletas, https : / /
+                        secardiologia
+                        . es / blog / 8298 - arritmia- ventricular- y- fibrosis- miocardica- en- atletas, Accessed: Aug.
+                        31,
+                        2024.</ol>
+                    <ol>[5] H. Y. Izquierdo, La arritmia cardiaca sacude al futbol: ´ el enemigo silencioso de los
+                        jugadores
+                        tras los casos del ‘Kun’ Aguero y Juan Izquierdo ¨ , https://www.eltiempo.
+                        com/deportes/futbol-internacional/la-arritmia-cardiacasacude - al - futbol - el - enemigo -
+                        silencioso -
+                        de - los - jugadores - tras - los - casos - del - kun - aguero - y - juan - izquierdo-3375588,
+                        Accessed:
+                        Aug. 31, 2024.</ol>
+                    <ol>[6] H. Heidbuchel, “The athlete’s heart is a proarrhythmic heart, and what that means for
+                        clinical
+                        decision making,” EP Eur., vol. 20, n.o 9, pags. 1401-1411, dic. de ´ 2017, Accessed Sep. 10,
+                        2024.
+                        direccion: https://doi. ´ org/10.1093/europace/eux294.</ol>
+                    <ol>[7] D. S. Desai y S. Hajouli, “Arrhythmias,” en StatPearls, Consultado: el 10 de septiembre de
+                        2024,
+                        Treasure Island (FL): StatPearls Publishing, 2024. direccion: http: ´
+                        //www.ncbi.nlm.nih.gov/books/NBK558923/.</ol>
+                    <ol>[8] A. A. Garc ´ ´ıa-Pena et al., “Prevalencia de fibrilaci ˜ on´ auricular en Colombia segun
+                        informaci
+                        ´ on del Sistema ´ Integral de Informacion de la Protecci ´ on Social (SIS- ´ PRO),” Revista
+                        Colombiana
+                        de Cardiolog´ıa, vol. 29, n.o 2, pags. 170-176, abr. de 2022. ´ DOI: 10.24875/rccar. m22000139.
+                    </ol>
+                    <ol>[9] M. Rage et al., “Cardiomyopathy and Sudden Cardiac Death Among the Athletes in Developing
+                        Countries:
+                        Incidence and Their Prevention Strategies,” Cureus, vol. 15, n.o 2, e35612, 2023. DOI: 10 . 7759
+                        /
+                        cureus . 35612. </ol>
+                    <ol>[10] A. E. V. Toaquiza y D. A. A. T. Aguilar, “Arritmias ventriculares y su relacion con la
+                        muerte s ´
+                        ubita car- ´ diaca en deportistas,” Ciencia Latina Revista Cient´ıfica Multidisciplinar, vol. 6,
+                        n.o 5,
+                        nov. de 2022. DOI: 10. 37811/cl rcm.v6i5.3313.</ol>
+                    <ol>[11] M. K. Turagam, G. C. Flaker, P. Velagapudi, S. Vadali y M. A. Alpert, “Atrial Fibrillation
+                        In
+                        Athletes: Pathophysiology, Clinical Presentation, Evaluation and Management,” J Atr
+                        Fibrillation, vol.
+                        8, n.o 4, pag. 1309, dic. de 2015. ´ DOI: 10.4022/jafib.1309. </ol>
+                    <ol>[12] A. Pingitore, M. Peruzzi, S. C. Clarich, Z. Palama,` L. Sciarra y E. Cavarretta, “An
+                        overview of
+                        the electrocardiographic monitoring devices in sports cardiology: Between present and future,”
+                        Clin.
+                        Cardiol., jun. de 2023, Accessed Sep. 10, 2024. direccion: https://doi. ´ org/10.1002/clc.24073.
+                    </ol>
+                    <ol>[13] F. Halabchi, T. Seif-Barghi y R. Mazaheri, “Sudden cardiac death in young athletes; a
+                        literature
+                        review and special considerations in asia,” Asian J. Sports Medicine, vol. 2, n.o 1, mar. de
+                        2011,
+                        Accessed Sep. 10, 2024. direccion: https://doi.org/10.5812/asjsm.34818</ol>
+
+
                 </div>
             </div>
-            <div class="col-6">
-                <div id="bpm-container">
-                    <h3 id="bpm-result"></h3>
-                    <h3 id="alert"></h3>
-                    <button id="more-info-button" class="btn btn-primary">Conocer mÃ¡s sobre mi estado</button>
-                    <div style="height: 50px;"></div>
+            <hr>
+            <div class="row">
+                <div class="col-6">
+                    <div>
+                        <label for="freq">Frequency: </label>
+                        <input type="range" id="freq" min="0" max="100" value="10" step="5">
+                        <span id="freq-display">10 Hz</span>
+                    </div>
+                    <div>
+                        <label for="start-point">Explore ECG: </label>
+                        <input type="range" id="start-point" min="0" value="0" step="1">
+                        <span id="start-point-display">0</span>
+                    </div>
+                    <div>
+                        <label for="window-size">Window size (number of data): </label>
+                        <input type="range" id="window-size" min="100" value="1" step="1">
+                        <span id="window-size-display">100</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div id="bpm-container">
+                        <h3 id="bpm-result"></h3>
+                        <h3 id="alert"></h3>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="row">
-            <div id="ecg-container"></div>
-        </div>
-        <div class="row">
-            <div id="tachogram-container"></div>
+            <div class="row">
+                <div class="d-flex justify-content-center">
+                    <button id="more-info-button" class="btn btn-primary">Get more information about my state</button>
+                </div>
+                <div style="height: 50px; text-align: center;"></div>
+
+            </div>
+            <div class="row">
+                <div id="ecg-container"></div>
+            </div>
+            <div class="row">
+                <div id="tachogram-container"></div>
+            </div>
         </div>
     </div>
-    
-    <footer id="footer">
-        <p>Authors: <a href="https://github.com/sergiocanar">Sergio Andres Canar Lozano</a> (202020383) and <a href="https://github.com/DavidTobonIBIO">David Tobon Molina</a> (202123804)</p>
-        <p>Source code: <a href="https://github.com/sergiocanar/signals_webpage">
-            https://github.com/sergiocanar/signals_webpage</a></p>
+    <footer id="footer" style="text-align: center;">
+        <p style="font-size: 18px; text-align: center; margin-top: 15px;">
+            Authors:
+            <a href="https://github.com/sergiocanar" style="font-size: 18px;">Sergio Andres Canar Lozano</a>
+            (202020383),
+            <a href="https://github.com/DavidTobonIBIO" style="font-size: 18px;">David Tobon Molina</a> (202123804),
+            <a href="https://github.com/msalcedog" style="font-size: 18px;">Martin Salcedo</a> (202123644),
+            and Wilman Sanchez (202116779)
+        </p>
+        <p style="font-size: 18px;text-align: center;">
+            Source code:
+            <a href="https://github.com/sergiocanar/signals_webpage" style="font-size: 18px;">
+                https://github.com/sergiocanar/signals_webpage
+            </a>
+        </p>
     </footer>
     <script>
 
@@ -195,7 +489,7 @@ function updateView() {
     document.getElementById('start-point-display').innerText = startPointVal;
     document.getElementById('window-size-display').innerText = windowSizeVal;
     
-    updatePlots(freqVal, startPointVal, windowSizeVal);  
+    updatePlots(freqVal, startPointVal, windowSizeVal);
     
     calculateBPM();
 }
@@ -215,7 +509,7 @@ function createECG(sampleRate) {
     setMaxSliderValues(nData); 
     let height = 200;
     let amplitude = height / 2;
-    let start = 0;
+    let start = 0
     let timePerSample = 1 / sampleRate;
 
     let maxAmplitude = amplitude * (0.5 + 0.5 * 0.5);
@@ -333,48 +627,62 @@ function calculateBPM() {
         const bpm = 60 / avgRRIntervals;
 
         document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
-        
-        moreInfoButton.style.display = "block"; 
+        moreInfoButton.style.display = "block";
 
         if (bpm < 60) {
             alertView.innerText = "Alert! possible bradycardia.";
             alertView.style.color = "red";
-            moreInfoButton.onclick = () => {
+            moreInfoButton.onclick = function () {
                 alert(`Bradycardia is a condition where the heart beats slower than normal. It can be serious in some cases and may require treatment.
-
+                    
                     Mild bradycardia: 50-60 bpm.
-
+                    
                     Moderate bradycardia: 40-50 bpm.
-
+                    
                     Severe bradycardia: Less than 40 bpm.`);
             };
         } else if (bpm > 100) {
             alertView.innerText = "Alert! possible tachycardia.";
             alertView.style.color = "red";
-            moreInfoButton.onclick = () => {
+            moreInfoButton.onclick = function () {
                 alert(`Tachycardia is a condition where the heart beats faster than normal. It is important to monitor it as it can lead to more serious problems.
-
+                    
                     Mild tachycardia: 100-120 bpm.
-
+                    
                     Moderate tachycardia: 120-150 bpm.
-
+                    
                     Severe tachycardia: More than 150 bpm.`);
             };
         } else {
             alertView.innerText = "Within the normal range.";
             alertView.style.color = "green";
-            moreInfoButton.onclick = () => {
-                alert("Tu frecuencia cardíaca está dentro de los niveles normales. ¡Sigue así!");
+            moreInfoButton.onclick = function () {
+                alert("Your heart rate is within normal levels. Keep it up!");
             };
         }
     } else {
         document.getElementById('bpm-result').innerText = "N/A";
         alertView.innerText = "Not enough peaks to calculate BPM.";
         alertView.style.color = "black";
-        moreInfoButton.style.display = "none"; 
+        moreInfoButton.style.display = "none";
     }
 }
 
+function showPopup() {
+    document.getElementById('popup').style.display = 'block'; 
+}
+
+function closePopup() {
+    document.getElementById('popup').style.display = 'none'; 
+}
+
+
+window.onclick = function (event) {
+    const popup = document.getElementById('popup');
+    if (event.target === popup) {
+        popup.style.display = 'none';
+    }
+};
 
 
 document.addEventListener('DOMContentLoaded', updateView);

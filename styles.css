@@ -1,28 +1,26 @@
-/* General */
 html, body {
-    height: 100%;  /* Ensure full height of the viewport */
+    height: 100%;
     margin: 0;
     padding: 0;
-    background-color: #F9F5FF;
+    background-color: #ffffff;
     font-family: Arial, sans-serif;
-    text-align: center; /* Center all text horizontally */
+    text-align: center;
     display: flex;
     flex-direction: column;
+    font-size: 20px;
 }
 
 .container {
-    flex: 1; /* This allows the container to grow and fill the available space */
-    padding-bottom: 60px; /* Adjust this to match the footer height */
+    flex: 1;
+    padding-bottom: 60px;
 }
 
-/* Header */
 header {
     background-color: #28262C;
     color: #F9F5FF;
     padding: 20px 0;
 }
 
-/* Sections */
 section {
     padding: 20px;
     margin: 20px;
@@ -32,8 +30,8 @@ section {
 }
 
 h1 {
-    margin: 0;
-    font-size: 2em;
+    margin: 50px;
+    font-size: 4em;
     color: #28262C;
 }
 
@@ -43,26 +41,21 @@ h2 {
     color: #28262C;
 }
 
-
-/* Button */
-#more-info-button {
-    padding: 10px 20px;
-    font-size: 1em;
-    color: #f7f7f7;
-    background-color: #28262C;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-    display:none;
-    margin: auto;
+h3 {
+    font-size: 15px;
 }
 
-#more-info-button:hover {
-    background-color: #14248A;
+h4 {
+    text-align: left;
+    font-size: 10px;
 }
 
-/* List */
+p {
+    text-align: justify;
+    font-size: 25px;
+}
+
+
 ul {
     list-style-type: none;
     padding: 0;
@@ -73,21 +66,35 @@ li {
     font-size: 16px;
 }
 
-/* Footer */
+ol {
+    list-style-type: decimal;
+    padding-left: 20px;
+    text-align: left;
+    margin: 0;    
+}
+
+ol li {
+    margin-bottom: 10px;
+    text-decoration: underline;
+    font-size: 25px; 
+}
+
+li p {
+    margin: 0;
+}
+
 #footer {
-    position: fixed; /* Keep footer fixed at the bottom */
-    bottom: 0;
-    width: 100%; /* Full width */
+    position: relative;
+    width: 100%;
     background-color: #28262C;
     color: white;
-    padding: 10px;
     text-align: center;
-    z-index: 10; /* Make sure it's above other content */
-    overflow-y: auto; /* Enable scrolling if content exceeds the height */
+    font-size: 5px;
 }
 
 a {
     color: #d7db1c;
+    font-size: 10px;
 }
 
 a:link, a:visited {
@@ -98,16 +105,66 @@ a:link, a:visited {
 #ecg-container {
     width: 100%; 
     height: 400px;
+    margin-bottom: 5%;
 }
 
 #tachogran-container {
     width: 100%;
-    height: 400px;
-    margin-top: 20px;
+    height: 500px;
+    margin-bottom: 100%;    
+    padding: 100px;
 }
-
 
 #freq {
     width: 10%;
-    margin: 0 auto;
+    margin: auto;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.popup-content {
+    background-color: #ffffff;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+}
+
+.btn-primary {
+    background-color: #14248A !important;
+    border-color: #14248A !important;
+    margin-top: 20px;
+    font-size: 10px;
 }
