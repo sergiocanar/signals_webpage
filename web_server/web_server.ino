@@ -232,14 +232,14 @@ void loop() {
   client.println("    <div class='container-fluid'>");
   client.println("        <div class='row'>");
   client.println("            <div class='col-4'>");
-  client.println("                <figure style='position: absolute; top: 20px; right:60%'>");
-  client.println("                    <img class='img-fluid' src='./images/ibio_n.png' alt='Universidad de los Andes' style='width: 70%;'>");
+  client.println("                <figure style='position: absolute; top: 60px; right:70%'>");
+  client.println("                    <img class='img-fluid' src='https://drive.google.com/thumbnail?id=1vUv7XzNJbRoR5laaYr--X_C4wTVjqs_K' alt='Universidad de los Andes' style='width: 400px;'>");
   client.println("                </figure>");
   client.println("            </div>");
   client.println("            <div class='col-4'>");
   client.println("                <figure");
   client.println("                    style='position: relative; top: 20px; display: flex; flex-direction: column; align-items: center; margin: 0 auto;'>");
-  client.println("                    <img class='img-fluid' src='./images/3_copy.png' alt='Descripción de la imagen'");
+  client.println("                    <img class='img-fluid' src='https://drive.google.com/thumbnail?id=1R8gDDiJrOu39KTVjqC5HQDitdLBYhqvo' alt='Descripción de la imagen'");
   client.println("                        style='width: 50%; margin-bottom: 3%;'>");
   client.println("                </figure>");
   client.println("            </div>");
@@ -255,7 +255,7 @@ void loop() {
   client.println("                    <span class='close' onclick='closePopup()'>&times;</span>");
   client.println("                    <h2>CardioHub: Monitoreo inteligente para atletas en evolución.</h2>");
   client.println("                    <figure style='position: relative; align-items: center; margin: 0 auto;'>");
-  client.println("                        <img class='img-fluid' src='./images/3_copy.png' alt='Descripción de la imagen'");
+  client.println("                        <img class='img-fluid' src='https://drive.google.com/thumbnail?id=1R8gDDiJrOu39KTVjqC5HQDitdLBYhqvo' alt='Descripción de la imagen'");
   client.println("                            style='width: 10%; '>");
   client.println("                    </figure>");
   client.println("                    <h4>Sobre las arritmias y la problemática actual: </h4>");
