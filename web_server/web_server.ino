@@ -50,7 +50,7 @@ void loop() {
   client.println("    <meta charset='UTF-8'>");
   client.println("    <meta name='viewport' content='width=device-width'>");
   client.println("    <meta http-equiv='X-UA-Compatible' content='ie=edge'>");
-  client.println("    <link rel='icon' href='./images/favicon.ico'>");
+  client.println("    <link rel='icon' href='https://drive.google.com/thumbnail?id=1tpmabnom3LA5a4O6Cv9xD30kTTo5dgG0'>");
   client.println("    <style>");
   client.println("html, body {");
   client.println("    height: 100%;");
@@ -303,7 +303,7 @@ void loop() {
   client.println("                        afección [6].");
   client.println("                    </p>");
   client.println("                    <figure style='position: relative; align-items: center; margin: 0 auto;'>");
-  client.println("                        <img class='img-fluid' src='./images/Imagen_inv.png' alt='Descripción de la imagen'");
+  client.println("                        <img class='img-fluid' src='https://i.ibb.co/FqC88ZV/Imagen-inv.png' alt='Descripción de la imagen'");
   client.println("                            style='width: 70%; '>");
   client.println("                    </figure>");
   client.println("                    <h4>Datos estadísticos sobre las arritmias, un problema común en atletas de alto rendimiento: </h4>");
@@ -383,7 +383,7 @@ void loop() {
   client.println("                        fortaleza.</p>");
   client.println("");
   client.println("                    <figure style='position: relative; align-items: center; margin: 0 auto;'>");
-  client.println("                        <img class='img-fluid' src='./images/Imagen4.jpg' alt='Descripción de la imagen'");
+  client.println("                        <img class='img-fluid' src='https://drive.google.com/thumbnail?id=1ezARWMQk74BPl_LAeOS_xsfKKdh7ba7C' alt='Descripción de la imagen'");
   client.println("                            style='width: 30%; '>");
   client.println("                    </figure>");
   client.println("");
