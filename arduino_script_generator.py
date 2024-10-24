@@ -3,7 +3,7 @@ import re
 
 
 def embed_files(html_file, css_file, js_file, output_file):
-    with open(html_file, "r") as file:
+    with open(html_file, "r", encoding="utf8") as file:
         html_content = file.read()
 
     with open(css_file, "r", encoding="utf8") as file:
@@ -92,7 +92,7 @@ void loop() {{
 }
 """
 
-    with open(output_file, "w") as file:
+    with open(output_file, "w", encoding="utf8") as file:
         file.write(arduino_code)
 
     print(f"Arduino code has been generated and saved to {output_file}.")
