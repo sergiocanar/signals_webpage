@@ -99,7 +99,7 @@ void loop() {{
 
 
 if __name__ == "__main__":
-    HTML_FILE = "index.html"
+    HTML_FILE = "index_english.html"
     CSS_FILE = "styles.css"
     JS_FILE = os.path.join("scripts", "main.js")
     os.makedirs("embedded", exist_ok=True)
