@@ -24,7 +24,7 @@ function updateView() {
     document.getElementById('start-point-display').innerText = startPointVal;
     document.getElementById('window-size-display').innerText = windowSizeVal;
     // Actualizar los gráficos
-    updatePlots(freqVal, startPointVal, windowSizeVal);  
+    updatePlots(freqVal, startPointVal, windowSizeVal);
     // Calcula los latidos por minuto
     calculateBPM();
 }
@@ -63,7 +63,7 @@ function createECG(sampleRate) {
     setMaxSliderValues(nData); // Establecer los valores máximos de los deslizadores
     let height = 200;
     let amplitude = height / 2;
-    let start = 0;
+    let start = 0
     let timePerSample = 1 / sampleRate;
 
     let maxAmplitude = amplitude * (0.5 + 0.5 * 0.5);
@@ -240,48 +240,62 @@ function calculateBPM() {
         const bpm = 60 / avgRRIntervals;
 
         document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
-        
-        moreInfoButton.style.display = "block"; 
+        moreInfoButton.style.display = "block";
 
         if (bpm < 60) {
             alertView.innerText = "Alert! possible bradycardia.";
             alertView.style.color = "red";
-            moreInfoButton.onclick = () => {
+            moreInfoButton.onclick = function () {
                 alert(`Bradycardia is a condition where the heart beats slower than normal. It can be serious in some cases and may require treatment.
-
+                    
                     Mild bradycardia: 50-60 bpm.
-
+                    
                     Moderate bradycardia: 40-50 bpm.
-
+                    
                     Severe bradycardia: Less than 40 bpm.`);
             };
         } else if (bpm > 100) {
             alertView.innerText = "Alert! possible tachycardia.";
             alertView.style.color = "red";
-            moreInfoButton.onclick = () => {
+            moreInfoButton.onclick = function () {
                 alert(`Tachycardia is a condition where the heart beats faster than normal. It is important to monitor it as it can lead to more serious problems.
-
+                    
                     Mild tachycardia: 100-120 bpm.
-
+                    
                     Moderate tachycardia: 120-150 bpm.
-
+                    
                     Severe tachycardia: More than 150 bpm.`);
             };
         } else {
             alertView.innerText = "Within the normal range.";
             alertView.style.color = "green";
-            moreInfoButton.onclick = () => {
-                alert("Tu frecuencia cardíaca está dentro de los niveles normales. ¡Sigue así!");
+            moreInfoButton.onclick = function () {
+                alert("Your heart rate is within normal levels. Keep it up!");
             };
         }
     } else {
         document.getElementById('bpm-result').innerText = "N/A";
         alertView.innerText = "Not enough peaks to calculate BPM.";
         alertView.style.color = "black";
-        moreInfoButton.style.display = "none"; // Ocultar botón si no hay BPM calculado
+        moreInfoButton.style.display = "none";
     }
 }
 
+function showPopup() {
+    document.getElementById('popup').style.display = 'block'; // Muestra el popup
+}
+
+function closePopup() {
+    document.getElementById('popup').style.display = 'none'; // Oculta el popup
+}
+
+// Cerrar el popup cuando se hace clic fuera del contenido
+window.onclick = function (event) {
+    const popup = document.getElementById('popup');
+    if (event.target === popup) {
+        popup.style.display = 'none';
+    }
+};
 
 // Plotear la señal ECG al cargar la página
 document.addEventListener('DOMContentLoaded', updateView);
