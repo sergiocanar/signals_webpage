@@ -15,7 +15,7 @@ function initializeECGChart() {
         chart: { type: 'line', animation: false },
         title: { text: 'ECG Signal' },
         xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
-        yAxis: { title: { text: 'Amplitude' } },
+        yAxis: { title: { text: 'Amplitude (mV)' } },
         series: [{ name: 'ECG Signal', data: [] }],
         plotOptions: { series: { marker: { enabled: false } } }
     });
@@ -35,7 +35,7 @@ function initializeTachogramChart() {
 function updateBuffers(sensorValue) {
     ecgSignal.push(sensorValue);
     timeArray.push(timeCounter);
-    timeCounter += DATA_COLLECTION_TIME;
+    timeCounter += DATA_COLLECTION_TIME / 1000;
     if (ecgSignal.length > MAX_BUFFER_SIZE) {
         ecgSignal.shift();
         timeArray.shift();
@@ -152,7 +152,7 @@ function calculateBPM() {
     }
 
     const avgRRInterval = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
-    const bpm = 60 / avgRRInterval;
+    const bpm = 0.006 / avgRRInterval;
 
     document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
     moreInfoButton.style.display = "block";

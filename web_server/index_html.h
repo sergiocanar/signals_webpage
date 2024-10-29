@@ -21,7 +21,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: #ffffff;
+    background-color: #72dbed;
     font-family: Arial, sans-serif;
     text-align: center;
     display: flex;
@@ -445,7 +445,7 @@ function initializeECGChart() {
         chart: { type: 'line', animation: false },
         title: { text: 'ECG Signal' },
         xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
-        yAxis: { title: { text: 'Amplitude' } },
+        yAxis: { title: { text: 'Amplitude (mV)' } },
         series: [{ name: 'ECG Signal', data: [] }],
         plotOptions: { series: { marker: { enabled: false } } }
     });
@@ -465,7 +465,7 @@ function initializeTachogramChart() {
 function updateBuffers(sensorValue) {
     ecgSignal.push(sensorValue);
     timeArray.push(timeCounter);
-    timeCounter += DATA_COLLECTION_TIME;
+    timeCounter += DATA_COLLECTION_TIME / 1000;
     if (ecgSignal.length > MAX_BUFFER_SIZE) {
         ecgSignal.shift();
         timeArray.shift();
@@ -490,7 +490,7 @@ function updateView() {
     let windowSizeVal = parseInt(document.getElementById('window-size').value);
     document.getElementById('freq-display').innerText = freqVal + ' Hz';
     document.getElementById('window-size-display').innerText = windowSizeVal;
-    updatePlots(freqVal, windowSizeVal);
+    updatePlots();
     calculateBPM();
 }
 
@@ -561,7 +561,7 @@ function updateTachogramPlot(tacoTimeArray, rrIntervals) {
     }
 }
 
-function updatePlots(freq, windowSize) {
+function updatePlots() {
     updateECGPlot();
 
     const data = detectPeaksWithSlidingWindow(windowSizeSlider.value, 10);
@@ -582,7 +582,7 @@ function calculateBPM() {
     }
 
     const avgRRInterval = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
-    const bpm = 60 / avgRRInterval;
+    const bpm = 0.006 / avgRRInterval;
 
     document.getElementById('bpm-result').innerText = bpm.toFixed(2) + ' BPM';
     moreInfoButton.style.display = 'block';
