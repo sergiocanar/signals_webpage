@@ -31,66 +31,28 @@ def embed_files(html_file, css_file, js_file, output_file):
     print(f"HTML file '{output_file}' has been generated with embedded CSS and JS.")
 
 
-def generate_header_file(html_file, output_file, wifi_ssid, wifi_password):
+def generate_header_file(html_file, output_file):
     with open(html_file, "r", encoding="utf8") as file:
         html_content = file.read()
 
-    html_content = html_content.replace('"', "'").splitlines()
+    html_content = html_content.replace('"', "'")
 
-    arduino_code = f"""// Generated Arduino code for NodeMCU to serve an HTML page
+    arduino_code = f"""// Generated header file with HTML content for NodeMCU to serve an HTML page
 
-#include <ESP8266WiFi.h> 
-#include <Wire.h>
+#ifndef INDEX_HTML_H
+#define INDEX_HTML_H
 
-// WiFi config
-const char* ssid = "{wifi_ssid}";  // WiFi Name
-const char* password = "{wifi_password}";  // WiFi Password
-WiFiServer server(80);
+#include <pgmspace.h> // Required to use PROGMEM on ESP8266/ESP32
 
-void setup() {{
-    Serial.begin(9600);
-    delay(10);
-
-    // Connecting to WiFi
-    Serial.print("Connecting to ");
-    Serial.println(ssid); 
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {{
-    delay(500);
-    Serial.print(".");
-    }}
-    Serial.println("");
-    Serial.println("WiFi connected");
-    server.begin();
-    Serial.println("Server started");
-    Serial.print("Use this URL to connect: http://");
-    Serial.println(WiFi.localIP());
-}}
-
-void loop() {{
-    WiFiClient client = server.available();
-    if (!client) {{
-    return;
-    }}
-
-    Serial.println("New client connected");
-
-    // Send headers
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: text/html");
-    client.println("Connection: close");
-    client.println();
-
-  // Send HTML content
+const char index_html[] PROGMEM = R"rawliteral(
 """
 
-    # Convert HTML to client.print() statements
-    for line in html_content:
-        arduino_code += f'  client.println("{line}");\n'
+    arduino_code += html_content
 
     arduino_code += """
-    client.println();
-}
+)rawliteral";
+
+#endif // INDEX_HTML_H
 """
 
     with open(output_file, "w", encoding="utf8") as file:
@@ -102,13 +64,13 @@ void loop() {{
 if __name__ == "__main__":
     HTML_FILE = "index_web_server.html"
     CSS_FILE = "styles.css"
-    JS_FILE = os.path.join("scripts", "main_web_server.js")
+    JS_FILE = os.path.join("scripts", "main2.js")
     print(JS_FILE)
     os.makedirs("embedded", exist_ok=True)
     EMBEDDED_HTML_PATH = os.path.join("embedded", "index.html")
     embed_files(HTML_FILE, CSS_FILE, JS_FILE, EMBEDDED_HTML_PATH)
 
-    HEADER_FILE = "index_html_test.h"
+    HEADER_FILE = "index_html.h"
     ARDUINO_DIR = "web_server"
     os.makedirs(ARDUINO_DIR, exist_ok=True)
     ARDUINO_PATH = os.path.join(ARDUINO_DIR, HEADER_FILE)

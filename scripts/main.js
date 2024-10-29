@@ -34,7 +34,7 @@ function updateView() {
  *
  * @param {number} nData - El valor máximo que se establecerá en los deslizadores.
  */
-function setMaxSliderValues(nData) {
+function setSliderValues(nData) {
     document.getElementById('start-point').max = nData;
     document.getElementById('window-size').max = nData;
 }
@@ -60,7 +60,7 @@ function createECG(sampleRate) {
     timeArray = [];
 
     const nData = 2000;
-    setMaxSliderValues(nData); // Establecer los valores máximos de los deslizadores
+    setSliderValues(nData); // Establecer los valores máximos de los deslizadores
     let height = 200;
     let amplitude = height / 2;
     let start = 0
