@@ -62,7 +62,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 
 
 if __name__ == "__main__":
-    HTML_FILE = "index_web_server.html"
+    HTML_FILE = "index.html"
     CSS_FILE = "styles.css"
     JS_FILE = os.path.join("scripts", "main2.js")
     print(JS_FILE)
