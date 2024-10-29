@@ -493,30 +493,15 @@ function setSliderValues(nData) {
 function detectPeaksInWindow(start, end) {
     let peaks = [];
     let window = ecgSignal.slice(start, end);
-    let peakValues = window.filter((val, i) =>
-        i > 0 && i < window.length - 1 && val > window[i - 1] && val > window[i + 1]
-    );
 
-    if (peakValues.length > 0) {
-        let meanVal = mean(peakValues);
-        let stdVal = std(peakValues, meanVal);
-
-        let minThreshold = meanVal + 1 * stdVal;
-        let maxThreshold = meanVal + 5 * stdVal;
-
-        for (let i = 1; i < window.length - 1; i++) {
-            if (
-                window[i] >= minThreshold &&
-                window[i] <= maxThreshold &&
-                window[i] > window[i - 1] &&
-                window[i] > window[i + 1]
-            ) {
-                peaks.push(start + i);
-            }
+    for (let i = 1; i < window.length - 1; i++) {
+        if (window[i] > window[i - 1] && window[i] > window[i + 1]) {
+            peaks.push(start + i);
         }
     }
     return peaks;
 }
+
 
 function detectPeaksWithSlidingWindow(windowSize, step) {
     let allPeaks = [];
@@ -542,23 +527,12 @@ function std(arr, meanVal) {
 function calculateRRIntervals(peaks, timeArray) {
     rrIntervals = [];
 
+    if (peaks.length < 2) return;
+
     for (let i = 1; i < peaks.length; i++) {
-        let rr = timeArray[peaks[i]] - timeArray[peaks[i - 1]];
-
-        if (rr > 0) {
-            rrIntervals.push(rr);
-        }
+        let rr = (timeArray[peaks[i]] - timeArray[peaks[i - 1]]) / 1000;
+        if (rr > 0) rrIntervals.push(rr);
     }
-}
-
-function plotTachogram(timeArray) {
-    Highcharts.chart('tachogram-container', {
-        chart: { type: 'line' },
-        title: { text: 'Tachogram' },
-        xAxis: { title: { text: 'Time (seconds)' }, categories: timeArray },
-        yAxis: { title: { text: 'RR-interval (seconds)' } },
-        series: [{ name: 'RR-interval', data: rrIntervals }]
-    });
 }
 
 function updateECGPlot() {
@@ -590,49 +564,51 @@ function updatePlots(freq, windowSize) {
 function calculateBPM() {
     let alertView = document.getElementById('alert');
     let moreInfoButton = document.getElementById('more-info-button');
-    if (rrIntervals.length > 0) {
-        const avgRRIntervals = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
-        const bpm = 60 / avgRRIntervals;
-
-        document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
-        moreInfoButton.style.display = "block";
-
-        if (bpm < 60) {
-            alertView.innerText = "Alert! possible bradycardia.";
-            alertView.style.color = "red";
-            moreInfoButton.onclick = function () {
-                alert(`Bradycardia is a condition where the heart beats slower than normal. It can be serious in some cases and may require treatment.
-                    
-                    Mild bradycardia: 50-60 bpm.
-                    
-                    Moderate bradycardia: 40-50 bpm.
-                    
-                    Severe bradycardia: Less than 40 bpm.`);
-            };
-        } else if (bpm > 100) {
-            alertView.innerText = "Alert! possible tachycardia.";
-            alertView.style.color = "red";
-            moreInfoButton.onclick = function () {
-                alert(`Tachycardia is a condition where the heart beats faster than normal. It is important to monitor it as it can lead to more serious problems.
-                    
-                    Mild tachycardia: 100-120 bpm.
-                    
-                    Moderate tachycardia: 120-150 bpm.
-                    
-                    Severe tachycardia: More than 150 bpm.`);
-            };
-        } else {
-            alertView.innerText = "Within the normal range.";
-            alertView.style.color = "green";
-            moreInfoButton.onclick = function () {
-                alert("Your heart rate is within normal levels. Keep it up!");
-            };
-        }
-    } else {
+    
+    if (rrIntervals.length === 0) {
         document.getElementById('bpm-result').innerText = "N/A";
         alertView.innerText = "Not enough peaks to calculate BPM.";
         alertView.style.color = "black";
         moreInfoButton.style.display = "none";
+        return;
+    }
+
+    const avgRRInterval = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
+    const bpm = 60 / avgRRInterval;
+
+    document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
+    moreInfoButton.style.display = "block";
+
+    if (bpm < 60) {
+        alertView.innerText = "Alert! possible bradycardia.";
+        alertView.style.color = "red";
+        moreInfoButton.onclick = function () {
+            alert(`Bradycardia is a condition where the heart beats slower than normal. It can be serious in some cases and may require treatment.
+                
+                Mild bradycardia: 50-60 bpm.
+                
+                Moderate bradycardia: 40-50 bpm.
+                
+                Severe bradycardia: Less than 40 bpm.`);
+        };
+    } else if (bpm > 100) {
+        alertView.innerText = "Alert! possible tachycardia.";
+        alertView.style.color = "red";
+        moreInfoButton.onclick = function () {
+            alert(`Tachycardia is a condition where the heart beats faster than normal. It is important to monitor it as it can lead to more serious problems.
+                
+                Mild tachycardia: 100-120 bpm.
+                
+                Moderate tachycardia: 120-150 bpm.
+                
+                Severe tachycardia: More than 150 bpm.`);
+        };
+    } else {
+        alertView.innerText = "Within the normal range.";
+        alertView.style.color = "green";
+        moreInfoButton.onclick = function () {
+            alert("Your heart rate is within normal levels. Keep it up!");
+        };
     }
 }
 
