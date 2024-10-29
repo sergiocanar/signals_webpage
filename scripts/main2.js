@@ -1,5 +1,4 @@
 const SENSOR_VALUE_ROUTE = '/sensorValue';
-const SENSOR_VALUE_ELEMENT_ID = 'sensor-value';
 const MAX_BUFFER_SIZE = 100;
 const DATA_COLLECTION_TIME = 50; // ms
 
@@ -48,7 +47,6 @@ function fetchSensorValue() {
         .then(response => response.text())
         .then(sensorValue => {
             sensorValue = parseInt(sensorValue);
-            document.getElementById(SENSOR_VALUE_ELEMENT_ID).innerHTML = sensorValue;
             updateBuffers(sensorValue);
             updateView();
         })
