@@ -21,7 +21,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: #ffffff;
+    background-color: #72dbed;
     font-family: Arial, sans-serif;
     text-align: center;
     display: flex;
@@ -428,15 +428,17 @@ button:hover {
   </footer>
     <script>
 const SENSOR_VALUE_ROUTE = '/sensorValue';
-const MAX_BUFFER_SIZE = 100;
-const DATA_COLLECTION_TIME = 50; 
 
+let ecgSampleRate = 130; 
+let dataCollectionTime = (1 / ecgSampleRate) * 1000; 
+let maxBufferSize = ecgSampleRate * 5; 
 let timeCounter = 0;
 let ecgSignal = [];
 let timeArray = [];
 let rrIntervals = [];
 let ecgChart;
 let tachogramChart;
+let fetchInterval;
 
 function initializeECGChart() {
     ecgChart = Highcharts.chart('ecg-container', {
@@ -482,11 +484,21 @@ function fetchSensorValue() {
         .catch(error => console.error('Error fetching sensor value:', error));
 }
 
+function updateSampleRate() {
+    dataCollectionTime = (1 / freqSlider.value) * 1000;
+    maxBufferSize = ecgSampleRate * 5
+
+    if (fetchInterval) clearInterval(fetchInterval); 
+
+    fetchInterval = setInterval(fetchSensorValue, dataCollectionTime); 
+}
+
 function updateView() {
-    let freqVal = parseInt(document.getElementById('freq').value);
+    let freqVal = parseFloat(document.getElementById('freq').value);
     let windowSizeVal = parseInt(document.getElementById('window-size').value);
     document.getElementById('freq-display').innerText = freqVal + ' Hz';
     document.getElementById('window-size-display').innerText = windowSizeVal;
+    updatePlots();
     updatePlots();
     calculateBPM();
 }
@@ -545,7 +557,7 @@ function updateECGPlot() {
         timeArray[timeArray.length - 1],
         ecgSignal[ecgSignal.length - 1]
     ];
-    ecgChart.series[0].addPoint(newECGPoint, true, ecgChart.series[0].data.length >= MAX_BUFFER_SIZE);
+    ecgChart.series[0].addPoint(newECGPoint, true, ecgChart.series[0].data.length >= maxBufferSize);
 }
 
 function updateTachogramPlot(tacoTimeArray, rrIntervals) {
@@ -554,10 +566,11 @@ function updateTachogramPlot(tacoTimeArray, rrIntervals) {
             tacoTimeArray[tacoTimeArray.length - 1],
             rrIntervals[rrIntervals.length - 1]
         ];
-        tachogramChart.series[0].addPoint(newTachoPoint, true, tachogramChart.series[0].data.length >= MAX_BUFFER_SIZE);
+        tachogramChart.series[0].addPoint(newTachoPoint, true, tachogramChart.series[0].data.length >= maxBufferSize);
     }
 }
 
+function updatePlots() {
 function updatePlots() {
     updateECGPlot();
 
@@ -569,7 +582,7 @@ function updatePlots() {
 function calculateBPM() {
     let alertView = document.getElementById('alert');
     let moreInfoButton = document.getElementById('more-info-button');
-    
+
     if (rrIntervals.length === 0) {
         document.getElementById('bpm-result').innerText = 'N/A';
         alertView.innerText = 'Not enough peaks to calculate BPM.';
@@ -639,14 +652,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let freqSlider = document.getElementById('freq');
-freqSlider.oninput = () => updateView();
+freqSlider.min = 50;
+freqSlider.max = 1000;
+freqSlider.step = 10;
+freqSlider.value = ecgSampleRate;
+let freqDisplay = document.getElementById('freq-display');
+freqDisplay.innerText = freqSlider.value + ' Hz';
+freqSlider.oninput = () => { updateView(); updateSampleRate(); };
 
 let windowSizeSlider = document.getElementById('window-size');
 windowSizeSlider.min = 1;
 windowSizeSlider.oninput = () => updateView();
 
-setInterval(fetchSensorValue, DATA_COLLECTION_TIME);
-
+fetchInterval = setInterval(fetchSensorValue, dataCollectionTime);
 </script>
   </body>
 </html>
