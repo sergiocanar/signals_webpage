@@ -6,9 +6,12 @@
 const char *SSID = "Familia Lozano_2.4-Etb";
 const char *PASSWORD = "enzo2021";
 
-const unsigned long TIMER_DELAY = 2;
+const unsigned long TIMER_DELAY = 2; //ms
 unsigned long lastReadingTime = 0;
 String sensorValue = "0";
+
+
+
 
 AsyncWebServer server(80);
 
