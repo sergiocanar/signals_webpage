@@ -58,16 +58,12 @@ function fetchBuffer() {
 
 function updateView() {
     console.log(ECGsignal.length);
-    let freqVal = parseInt(document.getElementById('freq').value);
-    let windowSizeVal = parseInt(document.getElementById('window-size').value);
-    document.getElementById('freq-display').innerText = freqVal + " Hz";
-    document.getElementById('window-size-display').innerText = windowSizeVal;
     updatePlots();
     calculateBPM();
 }
 
-function setSliderValues(nData) {
-    document.getElementById('window-size').max = nData;
+function pamTompkins() {
+    
 }
 
 function detectPeaksInWindow(start, end) {
@@ -212,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeTachogramChart();
     updateView();
 });
+
 
 let freqSlider = document.getElementById("freq");
 freqSlider.oninput = () => updateView();
