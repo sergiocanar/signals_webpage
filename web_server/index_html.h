@@ -191,6 +191,7 @@ button:hover {
     <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css' rel='stylesheet'
         integrity='sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH' crossorigin='anonymous'>
     <script src='https://code.highcharts.com/highcharts.js'></script>
+    <script src='https://raw.githubusercontent.com/corbanbrook/dsp.js/refs/heads/master/dsp.js'></script>
 </head>
   <body>
     <div class='container-fluid'>
@@ -430,6 +431,7 @@ button:hover {
 const BUFFER_ROUTE = '/buffer';
 const MAX_BUFFER_SIZE = 100;
 const DATA_COLLECTION_TIME = 500; 
+const SAMPLE_RATE = 500; 
 
 let timeCounter = 0;
 let timeSampleRate = 2; 
@@ -438,6 +440,14 @@ let timeArray = [];
 let rrIntervals = [];
 let ecgChart;
 let tachogramChart;
+var filter = IIRFilter(LOWPASS, 20, SAMPLE_RATE);
+
+
+function filterSignal(signal, filter) {
+    filter.process(signal);
+    return filter.output;
+}
+
 
 function initializeECGChart() {
     ecgChart = Highcharts.chart('ecg-container', {

@@ -1,6 +1,7 @@
 const BUFFER_ROUTE = '/buffer';
 const MAX_BUFFER_SIZE = 100;
 const DATA_COLLECTION_TIME = 500; // ms
+const SAMPLE_RATE = 500; // Hz
 
 let timeCounter = 0;
 let timeSampleRate = 2; // ms
@@ -9,6 +10,14 @@ let timeArray = [];
 let rrIntervals = [];
 let ecgChart;
 let tachogramChart;
+//var filter = IIRFilter(LOWPASS, 20, SAMPLE_RATE);
+
+
+function filterSignal(signal, filter) {
+    filter.process(signal);
+    return filter.output;
+}
+
 
 function initializeECGChart() {
     ecgChart = Highcharts.chart('ecg-container', {

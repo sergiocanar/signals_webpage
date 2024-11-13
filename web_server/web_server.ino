@@ -3,8 +3,8 @@
 #include <ESPAsyncTCP.h>
 #include "index_html.h"
 
-const char *SSID = "Familia Lozano_2.4-Etb";
-const char *PASSWORD = "enzo2021";
+const char *SSID = "sergi";
+const char *PASSWORD = "sergio17";
 
 const unsigned long TIMER_DELAY = 2; //ms
 unsigned long lastReadingTime = 0;
