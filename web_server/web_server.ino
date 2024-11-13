@@ -6,9 +6,9 @@
 const char *SSID = "sergi";
 const char *PASSWORD = "sergio17";
 
-const unsigned long TIMER_DELAY = 5; //ms
+const unsigned long TIMER_DELAY_MS = 5;
 const unsigned int REQUEST_INTERVAL_MS = 500;
-const unsigned int BUFFER_SIZE = REQUEST_INTERVAL_MS / TIMER_DELAY;
+const unsigned int BUFFER_SIZE = REQUEST_INTERVAL_MS / TIMER_DELAY_MS;
 
 float buffer[BUFFER_SIZE];
 unsigned long lastReadingTime = 0;
@@ -63,7 +63,7 @@ void loop() {
 }
 
 void readSensorValue() {
-  if ((millis() - lastReadingTime) > TIMER_DELAY) {
+  if ((millis() - lastReadingTime) > TIMER_DELAY_MS) {
     float sensorValue = (float) analogRead(A0) * (3.3 / 1024) ;
     for (int i = 0; i < BUFFER_SIZE - 1; i++) {
       buffer[i] = buffer[i+1];

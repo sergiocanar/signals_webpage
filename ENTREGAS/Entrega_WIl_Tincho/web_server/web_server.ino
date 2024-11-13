@@ -6,7 +6,7 @@
 const char *SSID = "ColdPalmer";
 const char *PASSWORD = "david4567";
 
-const unsigned long TIMER_DELAY = 1; // Adjust if necessary
+const unsigned long TIMER_DELAY_MS = 1; // Adjust if necessary
 unsigned long lastReadingTime = 0;
 String sensorValue = "0";
 
@@ -48,7 +48,7 @@ void loop() {
 }
 
 void readSensorValue() {
-  if ((millis() - lastReadingTime) > TIMER_DELAY) {
+  if ((millis() - lastReadingTime) > TIMER_DELAY_MS) {
     sensorValue = String(analogRead(A0));
     lastReadingTime = millis();
   }
