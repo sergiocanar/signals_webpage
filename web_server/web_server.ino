@@ -3,14 +3,14 @@
 #include <ESPAsyncTCP.h>
 #include "index_html.h"
 
-const char *SSID = "sergi";
-const char *PASSWORD = "sergio17";
+const char *SSID = "ColdPalmer";
+const char *PASSWORD = "david4567";
 
 const unsigned long TIMER_DELAY_MS = 5;
 const unsigned int REQUEST_INTERVAL_MS = 500;
 const unsigned int BUFFER_SIZE = REQUEST_INTERVAL_MS / TIMER_DELAY_MS;
 
-float buffer[BUFFER_SIZE];
+float dataBuffer[BUFFER_SIZE];
 unsigned long lastReadingTime = 0;
 
 AsyncWebServer server(80);
@@ -37,9 +37,9 @@ void setup() {
 
   server.on("/buffer", HTTP_GET, [](AsyncWebServerRequest *request) {
     String json = "[";
-    for (int i = 0; i < 250; i++) {
-      json += String(buffer[i]);
-      if (i < 249) {
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+      json += String(dataBuffer[i]);
+      if (i < BUFFER_SIZE - 1) {
         json += ",";
       }
     }
@@ -60,11 +60,12 @@ void loop() {
 
 void readSensorValue() {
   if ((millis() - lastReadingTime) > TIMER_DELAY_MS) {
-    float sensorValue = (float) analogRead(A0) * (3.3 / 1024) ;
+    float sensorValue = 1000 * (float)analogRead(A0) * (3.3 / 1024);  // en mV
+    Serial.println(sensorValue);
     for (int i = 0; i < BUFFER_SIZE - 1; i++) {
-      buffer[i] = buffer[i+1];
+      dataBuffer[i] = dataBuffer[i + 1];
     }
-    buffer[BUFFER_SIZE - 1] = sensorValue;
+    dataBuffer[BUFFER_SIZE - 1] = sensorValue;
     lastReadingTime = millis();
   }
 }

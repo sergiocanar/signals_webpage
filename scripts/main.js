@@ -39,25 +39,23 @@ function updateBuffers(sensorValue) {
     ECGsignal.push(sensorValue);
     timeCounter += SAMPLE_PERIOD_MS / 1000;
     timeArray.push(timeCounter);
-    if (ECGsignal.length > MAX_BUFFER_SIZE) {
+    if (ECGsignal.length > BUFFER_SIZE) {
         ECGsignal.shift();
         timeArray.shift();
     }
-    setSliderValues(ECGsignal.length);
 }
 
 function fetchBuffer() {
     fetch(BUFFER_ROUTE)
         .then(response => response.json())
         .then(buffer => {
-            buffer.map(value => updateBuffers(parseInt(value)));
+            buffer.map(value => updateBuffers(parseFloat(value)));
             updateView();
         })
         .catch(error => console.error('Error fetching sensor value:', error));
 }
 
 function updateView() {
-    console.log(ECGsignal.length);
     updatePlots();
     calculateBPM();
 }
@@ -170,7 +168,7 @@ function updateECGPlot() {
         timeArray[timeArray.length - 1],
         ECGsignal[ECGsignal.length - 1]
     ];
-    ecgChart.series[0].addPoint(newECGPoint, true, ecgChart.series[0].data.length >= MAX_BUFFER_SIZE);
+    ecgChart.series[0].addPoint(newECGPoint, true, ecgChart.series[0].data.length >= BUFFER_SIZE);
 }
 
 function updateTachogramPlot(tacoTimeArray, rrIntervals) {
@@ -179,7 +177,7 @@ function updateTachogramPlot(tacoTimeArray, rrIntervals) {
             tacoTimeArray[tacoTimeArray.length - 1],
             rrIntervals[rrIntervals.length - 1]
         ];
-        tachogramChart.series[0].addPoint(newTachoPoint, true, tachogramChart.series[0].data.length >= MAX_BUFFER_SIZE);
+        tachogramChart.series[0].addPoint(newTachoPoint, true, tachogramChart.series[0].data.length >= BUFFER_SIZE);
     }
 }
 
@@ -263,12 +261,5 @@ document.addEventListener('DOMContentLoaded', () => {
     updateView();
 });
 
-
-let freqSlider = document.getElementById("freq");
-freqSlider.oninput = () => updateView();
-
-let windowSizeSlider = document.getElementById("window-size");
-windowSizeSlider.min = 1;
-windowSizeSlider.oninput = () => updateView();
 
 setInterval(fetchBuffer, DATA_COLLECTION_TIME_MS);
