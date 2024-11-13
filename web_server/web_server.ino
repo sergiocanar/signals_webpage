@@ -6,7 +6,7 @@
 const char *SSID = "Familia Lozano_2.4-Etb";
 const char *PASSWORD = "enzo2021";
 
-const unsigned long TIMER_DELAY = 1; // Adjust if necessary
+const unsigned long TIMER_DELAY = 10; // Adjust if necessary
 unsigned long lastReadingTime = 0;
 String sensorValue = "0";
 

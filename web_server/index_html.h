@@ -429,7 +429,7 @@ button:hover {
     <script>
 const SENSOR_VALUE_ROUTE = '/sensorValue';
 const MAX_BUFFER_SIZE = 100;
-const DATA_COLLECTION_TIME = 50; 
+const DATA_COLLECTION_TIME = 1000; 
 
 let timeCounter = 0;
 let ecgSignal = [];
@@ -646,7 +646,6 @@ windowSizeSlider.min = 1;
 windowSizeSlider.oninput = () => updateView();
 
 setInterval(fetchSensorValue, DATA_COLLECTION_TIME);
-
 </script>
   </body>
 </html>

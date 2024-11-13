@@ -1,6 +1,6 @@
 const SENSOR_VALUE_ROUTE = '/sensorValue';
 const MAX_BUFFER_SIZE = 100;
-const DATA_COLLECTION_TIME = 50; // ms
+const DATA_COLLECTION_TIME = 1000; // ms
 
 let timeCounter = 0;
 let ecgSignal = [];
