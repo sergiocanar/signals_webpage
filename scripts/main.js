@@ -3,6 +3,7 @@ const MAX_BUFFER_SIZE = 100;
 const DATA_COLLECTION_TIME = 500; // ms
 
 let timeCounter = 0;
+let timeSampleRate = 2; // ms
 let ecgSignal = [];
 let timeArray = [];
 let rrIntervals = [];
@@ -33,7 +34,7 @@ function initializeTachogramChart() {
 
 function updateBuffers(sensorValue) {
     ecgSignal.push(sensorValue);
-    timeCounter += DATA_COLLECTION_TIME / 1000;
+    timeCounter += timeSampleRate / 1000;
     timeArray.push(timeCounter);
     if (ecgSignal.length > MAX_BUFFER_SIZE) {
         ecgSignal.shift();
@@ -53,7 +54,7 @@ function fetchBuffer() {
 }
 
 function updateView() {
-    console.log(buffer.length);
+    console.log(ecgSignal.length);
     let freqVal = parseInt(document.getElementById('freq').value);
     let windowSizeVal = parseInt(document.getElementById('window-size').value);
     document.getElementById('freq-display').innerText = freqVal + " Hz";

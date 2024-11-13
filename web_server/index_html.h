@@ -3,7 +3,7 @@
 #ifndef INDEX_HTML_H
 #define INDEX_HTML_H
 
-#include <pgmspace.h> // Required to use PROGMEM on ESP8266/ESP32
+#include <pgmspace.h>
 
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML>
@@ -427,11 +427,12 @@ button:hover {
       </p>
   </footer>
     <script>
-const SENSOR_VALUE_ROUTE = '/sensorValue';
+const BUFFER_ROUTE = '/buffer';
 const MAX_BUFFER_SIZE = 100;
 const DATA_COLLECTION_TIME = 500; 
 
 let timeCounter = 0;
+let timeSampleRate = 2; 
 let ecgSignal = [];
 let timeArray = [];
 let rrIntervals = [];
@@ -462,8 +463,8 @@ function initializeTachogramChart() {
 
 function updateBuffers(sensorValue) {
     ecgSignal.push(sensorValue);
+    timeCounter += timeSampleRate / 1000;
     timeArray.push(timeCounter);
-    timeCounter += DATA_COLLECTION_TIME / 1000;
     if (ecgSignal.length > MAX_BUFFER_SIZE) {
         ecgSignal.shift();
         timeArray.shift();
@@ -471,18 +472,18 @@ function updateBuffers(sensorValue) {
     setSliderValues(ecgSignal.length);
 }
 
-function fetchSensorValue() {
-    fetch(SENSOR_VALUE_ROUTE)
-        .then(response => response.text())
-        .then(sensorValue => {
-            sensorValue = parseInt(sensorValue);
-            updateBuffers(sensorValue);
+function fetchBuffer() {
+    fetch(BUFFER_ROUTE)
+        .then(response => response.json())
+        .then(buffer => {
+            buffer.map(value => updateBuffers(parseInt(value)));
             updateView();
         })
         .catch(error => console.error('Error fetching sensor value:', error));
 }
 
 function updateView() {
+    console.log(ecgSignal.length);
     let freqVal = parseInt(document.getElementById('freq').value);
     let windowSizeVal = parseInt(document.getElementById('window-size').value);
     document.getElementById('freq-display').innerText = freqVal + ' Hz';
@@ -645,7 +646,7 @@ let windowSizeSlider = document.getElementById('window-size');
 windowSizeSlider.min = 1;
 windowSizeSlider.oninput = () => updateView();
 
-setInterval(fetchSensorValue, DATA_COLLECTION_TIME);
+setInterval(fetchBuffer, DATA_COLLECTION_TIME);
 </script>
   </body>
 </html>
