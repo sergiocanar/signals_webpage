@@ -33,8 +33,20 @@ void setup() {
     request->send_P(200, "text/html", index_html);
   });
 
-  server.on("/sensorValue", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send_P(200, "text/plain", sensorValue.c_str());
+  // server.on("/sensorValue", HTTP_GET, [](AsyncWebServerRequest *request) {
+  //   request->send_P(200, "text/plain", sensorValue.c_str());
+  // });
+
+  server.on("/buffer", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String json = "[";
+    for (int i = 0; i < 250; i++) {
+      json += String(buffer[i]);
+      if (i < 249) {
+        json += ",";
+      }
+    }
+    json += "]";
+    request->send(200, "application/json", json);
   });
 
   server.begin();
@@ -51,6 +63,10 @@ void loop() {
 void readSensorValue() {
   if ((millis() - lastReadingTime) > TIMER_DELAY) {
     unsigned int sensorValue = analogRead(A0);
+    for (int i = 0; i < 249; i++) {
+      buffer[i] = buffer[i+1];
+    }
+    buffer[249] = sensorValue;
     lastReadingTime = millis();
   }
 }

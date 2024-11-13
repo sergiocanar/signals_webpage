@@ -42,7 +42,7 @@ def generate_header_file(html_file, output_file):
 #ifndef INDEX_HTML_H
 #define INDEX_HTML_H
 
-#include <pgmspace.h> // Required to use PROGMEM on ESP8266/ESP32
+#include <pgmspace.h>
 
 const char index_html[] PROGMEM = R"rawliteral(
 """

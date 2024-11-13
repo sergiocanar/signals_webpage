@@ -1,4 +1,4 @@
-const SENSOR_VALUE_ROUTE = '/sensorValue';
+const BUFFER_ROUTE = '/buffer';
 const MAX_BUFFER_SIZE = 100;
 const DATA_COLLECTION_TIME = 500; // ms
 
@@ -33,8 +33,8 @@ function initializeTachogramChart() {
 
 function updateBuffers(sensorValue) {
     ecgSignal.push(sensorValue);
-    timeArray.push(timeCounter);
     timeCounter += DATA_COLLECTION_TIME / 1000;
+    timeArray.push(timeCounter);
     if (ecgSignal.length > MAX_BUFFER_SIZE) {
         ecgSignal.shift();
         timeArray.shift();
@@ -42,18 +42,18 @@ function updateBuffers(sensorValue) {
     setSliderValues(ecgSignal.length);
 }
 
-function fetchSensorValue() {
-    fetch(SENSOR_VALUE_ROUTE)
-        .then(response => response.text())
-        .then(sensorValue => {
-            sensorValue = parseInt(sensorValue);
-            updateBuffers(sensorValue);
+function fetchBuffer() {
+    fetch(BUFFER_ROUTE)
+        .then(response => response.json())
+        .then(buffer => {
+            buffer.map(value => updateBuffers(parseInt(value)));
             updateView();
         })
         .catch(error => console.error('Error fetching sensor value:', error));
 }
 
 function updateView() {
+    console.log(buffer.length);
     let freqVal = parseInt(document.getElementById('freq').value);
     let windowSizeVal = parseInt(document.getElementById('window-size').value);
     document.getElementById('freq-display').innerText = freqVal + " Hz";
@@ -216,4 +216,4 @@ let windowSizeSlider = document.getElementById("window-size");
 windowSizeSlider.min = 1;
 windowSizeSlider.oninput = () => updateView();
 
-setInterval(fetchSensorValue, DATA_COLLECTION_TIME);
+setInterval(fetchBuffer, DATA_COLLECTION_TIME);
