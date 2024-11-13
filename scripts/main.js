@@ -12,6 +12,10 @@ let rrIntervals = [];
 let ecgChart;
 let tachogramChart;
 
+let derivateChart;
+let integralChart;
+let thresholdChart;
+
 
 function initializeECGChart() {
     ecgChart = Highcharts.chart('ecg-container', {
@@ -34,6 +38,66 @@ function initializeTachogramChart() {
         plotOptions: { series: { marker: { enabled: false } } }
     });
 }
+
+function initializeOtherCharts() {
+    derivateChart = Highcharts.chart('derivative-container', {
+        chart: { type: 'line', animation: false },
+        title: { text: 'Squared Derivative' },
+        xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
+        yAxis: { title: { text: 'Squared Derivate' } },
+        series: [{ name: 'Derivative', data: [] }],
+        plotOptions: { series: { marker: { enabled: false } } }
+    });
+
+    integralChart = Highcharts.chart('integral-container', {
+        chart: { type: 'line', animation: false },
+        title: { text: 'Integral' },
+        xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
+        yAxis: { title: { text: 'Integral' } },
+        series: [{ name: 'Integral', data: [] }],
+        plotOptions: { series: { marker: { enabled: false } } }
+    });
+
+    thresholdChart = Highcharts.chart('threshold-container', {
+        chart: { type: 'line', animation: false },
+        title: { text: 'Threshold' },
+        xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
+        yAxis: { title: { text: 'Threshold' } },
+        series: [{ name: 'Threshold', data: [] }],
+        plotOptions: { series: { marker: { enabled: false } } }
+    });
+}
+
+function updateECGChart() {
+    const newECGPoint = [
+        timeArray[timeArray.length - 1],
+        ECGsignal[ECGsignal.length - 1]
+    ];
+    ecgChart.series[0].addPoint(newECGPoint, true, ecgChart.series[0].data.length >= BUFFER_SIZE);
+}
+
+function updateTachogramChart(tacoTimeArray, rrIntervals) {
+    if (rrIntervals.length > 0) {
+        const newTachoPoint = [
+            tacoTimeArray[tacoTimeArray.length - 1],
+            rrIntervals[rrIntervals.length - 1]
+        ];
+        tachogramChart.series[0].addPoint(newTachoPoint, true, tachogramChart.series[0].data.length >= BUFFER_SIZE);
+    }
+}
+
+function updateOtherPlots(derivative, integral, threshold) {
+    for (let i = 0; i < derivative.length; i++) {
+        derivateChart.series[0].addPoint([timeArray[i], derivative[i]], true, derivateChart.series[0].data.length >= BUFFER_SIZE);
+    }
+    for (let i = 0; i < integral.length; i++) {
+        integralChart.series[0].addPoint([timeArray[i], integral[i]], true, integralChart.series[0].data.length >= BUFFER_SIZE);
+    }
+    for (let i = 0; i < threshold.length; i++) {
+        thresholdChart.series[0].addPoint([timeArray[i], threshold[i]], true, thresholdChart.series[0].data.length >= BUFFER_SIZE);
+    }
+}
+    
 
 function updateBuffers(sensorValue) {
     ECGsignal.push(sensorValue);
@@ -69,7 +133,7 @@ function reducedPamTompkins(signal) {
     let integratedSignal = moving_window_integration(diffSquaredSignal);
 
     let thresholdedSignal = threshold_and_decision(integratedSignal);
-
+    updateOtherPlots(diffSquaredSignal, integratedSignal, thresholdedSignal);
     return thresholdedSignal;
 
 }
@@ -163,30 +227,12 @@ function calculateRRIntervals(peaks, timeArray) {
     }
 }
 
-function updateECGPlot() {
-    const newECGPoint = [
-        timeArray[timeArray.length - 1],
-        ECGsignal[ECGsignal.length - 1]
-    ];
-    ecgChart.series[0].addPoint(newECGPoint, true, ecgChart.series[0].data.length >= BUFFER_SIZE);
-}
-
-function updateTachogramPlot(tacoTimeArray, rrIntervals) {
-    if (rrIntervals.length > 0) {
-        const newTachoPoint = [
-            tacoTimeArray[tacoTimeArray.length - 1],
-            rrIntervals[rrIntervals.length - 1]
-        ];
-        tachogramChart.series[0].addPoint(newTachoPoint, true, tachogramChart.series[0].data.length >= BUFFER_SIZE);
-    }
-}
-
 function updatePlots() {
-    updateECGPlot();
+    updateECGChart();
     outputSignal = reducedPamTompkins(ECGsignal);
     const data = detectPeaksWithSlidingWindow(outputSignal);
     calculateRRIntervals(data.allPeaks, data.tacoTimeArray);
-    updateTachogramPlot(data.tacoTimeArray, rrIntervals);
+    updateTachogramChart(data.tacoTimeArray, rrIntervals);
 }
 
 function calculateBPM() {
