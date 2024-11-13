@@ -35,10 +35,6 @@ void setup() {
     request->send_P(200, "text/html", index_html);
   });
 
-  // server.on("/sensorValue", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send_P(200, "text/plain", sensorValue.c_str());
-  // });
-
   server.on("/buffer", HTTP_GET, [](AsyncWebServerRequest *request) {
     String json = "[";
     for (int i = 0; i < 250; i++) {
