@@ -64,7 +64,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 if __name__ == "__main__":
     HTML_FILE = "index.html"
     CSS_FILE = "styles.css"
-    JS_FILE = os.path.join("scripts", "main2.js")
+    JS_FILE = os.path.join("scripts", "main.js")
     print(JS_FILE)
     os.makedirs("embedded", exist_ok=True)
     EMBEDDED_HTML_PATH = os.path.join("embedded", "index.html")
