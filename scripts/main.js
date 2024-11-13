@@ -1,8 +1,9 @@
 const BUFFER_ROUTE = '/buffer';
-const MAX_BUFFER_SIZE = 100;
+const SECONDS_TO_STORE = 10;
 const DATA_COLLECTION_TIME_MS = 500; // ms
-const SAMPLE_RATE_HZ = 500; // Hz
 const SAMPLE_PERIOD_MS = 2; // ms
+const SAMPLE_RATE_HZ = 500; // Hz
+const BUFFER_SIZE = SECONDS_TO_STORE * SAMPLE_RATE_HZ;
 
 let timeCounter = 0;
 let ECGsignal = [];
