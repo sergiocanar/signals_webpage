@@ -1,22 +1,15 @@
 const BUFFER_ROUTE = '/buffer';
 const MAX_BUFFER_SIZE = 100;
-const DATA_COLLECTION_TIME = 500; // ms
-const SAMPLE_RATE = 500; // Hz
+const DATA_COLLECTION_TIME_MS = 500; // ms
+const SAMPLE_RATE_HZ = 500; // Hz
+const SAMPLE_PERIOD_MS = 2; // ms
 
 let timeCounter = 0;
-let timeSampleRate = 2; // ms
-let ecgSignal = [];
+let ECGsignal = [];
 let timeArray = [];
 let rrIntervals = [];
 let ecgChart;
 let tachogramChart;
-//var filter = IIRFilter(LOWPASS, 20, SAMPLE_RATE);
-
-
-function filterSignal(signal, filter) {
-    filter.process(signal);
-    return filter.output;
-}
 
 
 function initializeECGChart() {
@@ -42,14 +35,14 @@ function initializeTachogramChart() {
 }
 
 function updateBuffers(sensorValue) {
-    ecgSignal.push(sensorValue);
-    timeCounter += timeSampleRate / 1000;
+    ECGsignal.push(sensorValue);
+    timeCounter += SAMPLE_PERIOD_MS / 1000;
     timeArray.push(timeCounter);
-    if (ecgSignal.length > MAX_BUFFER_SIZE) {
-        ecgSignal.shift();
+    if (ECGsignal.length > MAX_BUFFER_SIZE) {
+        ECGsignal.shift();
         timeArray.shift();
     }
-    setSliderValues(ecgSignal.length);
+    setSliderValues(ECGsignal.length);
 }
 
 function fetchBuffer() {
@@ -63,7 +56,7 @@ function fetchBuffer() {
 }
 
 function updateView() {
-    console.log(ecgSignal.length);
+    console.log(ECGsignal.length);
     let freqVal = parseInt(document.getElementById('freq').value);
     let windowSizeVal = parseInt(document.getElementById('window-size').value);
     document.getElementById('freq-display').innerText = freqVal + " Hz";
@@ -78,7 +71,7 @@ function setSliderValues(nData) {
 
 function detectPeaksInWindow(start, end) {
     let peaks = [];
-    let window = ecgSignal.slice(start, end);
+    let window = ECGsignal.slice(start, end);
 
     for (let i = 1; i < window.length - 1; i++) {
         if (window[i] > window[i - 1] && window[i] > window[i + 1]) {
@@ -92,7 +85,7 @@ function detectPeaksInWindow(start, end) {
 function detectPeaksWithSlidingWindow(windowSize, step) {
     let allPeaks = [];
 
-    for (let start = 0; start < ecgSignal.length - windowSize; start += step) {
+    for (let start = 0; start < ECGsignal.length - windowSize; start += step) {
         let end = start + windowSize;
         let peaks = detectPeaksInWindow(start, end);
         allPeaks.push(...peaks);
@@ -124,7 +117,7 @@ function calculateRRIntervals(peaks, timeArray) {
 function updateECGPlot() {
     const newECGPoint = [
         timeArray[timeArray.length - 1],
-        ecgSignal[ecgSignal.length - 1]
+        ECGsignal[ECGsignal.length - 1]
     ];
     ecgChart.series[0].addPoint(newECGPoint, true, ecgChart.series[0].data.length >= MAX_BUFFER_SIZE);
 }
@@ -226,4 +219,4 @@ let windowSizeSlider = document.getElementById("window-size");
 windowSizeSlider.min = 1;
 windowSizeSlider.oninput = () => updateView();
 
-setInterval(fetchBuffer, DATA_COLLECTION_TIME);
+setInterval(fetchBuffer, DATA_COLLECTION_TIME_MS);
