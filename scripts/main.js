@@ -1,8 +1,8 @@
 const BUFFER_ROUTE = '/buffer';
 const SECONDS_TO_STORE = 10;
 const DATA_COLLECTION_TIME_MS = 500; // ms
-const SAMPLE_PERIOD_MS = 2; // ms
-const SAMPLE_RATE_HZ = 500; // Hz
+const SAMPLE_PERIOD_MS = 5; // ms
+const SAMPLE_RATE_HZ = Math.round(1 / (SAMPLE_PERIOD_MS / 1000)); // Hz
 const BUFFER_SIZE = SECONDS_TO_STORE * SAMPLE_RATE_HZ;
 
 let timeCounter = 0;
@@ -62,8 +62,55 @@ function updateView() {
     calculateBPM();
 }
 
-function pamTompkins() {
-    
+function reducedPamTompkins(signal) {
+
+    let baseSignal = Array.from(signal);
+
+    let diffSquaredSignal = derivative_and_squaring(baseSignal);
+
+    let integratedSignal = moving_window_integration(diffSquaredSignal);
+
+    return integratedSignal;
+
+}
+
+function derivative_and_squaring(signal) {
+
+    for (let i = 0; i < signal.length - 1; i++) {
+        signal[i] = (signal[i + 1] - signal[i]) / (SAMPLE_PERIOD_MS / 1000);
+        signal[i] = signal[i] ** 2;
+    }
+
+    signal = signal.slice(0, signal.length - 1);
+
+    return signal;
+}
+
+function moving_window_integration(signal) {
+
+    let window_size = 0.03; // 30  ms (tomado del artículo oficial del algoritmo para un sample rate de 200 Hz)
+
+    let half_window_size = Math.floor(window_size / 2);
+    let n_samples_in_half_window = Math.round(half_window_size / (SAMPLE_PERIOD_MS / 1000));
+    let outputSignal = Array(signal.length).fill(0);
+
+    for (let i = 0; i < signal.length; i++) {
+        start_i = i - n_samples_in_half_window;
+        end_i = i + n_samples_in_half_window;
+        if (start_i < 0) {
+            start_i = 0;
+        }
+        if (end_i > signal.length) {
+            end_i = signal.length;
+        }
+        outputSignal = mean(signal.slice(start_i, end_i));
+    }
+
+    return outputSignal;
+}
+
+function threshold(signal) {
+
 }
 
 function detectPeaksInWindow(start, end) {
@@ -79,12 +126,14 @@ function detectPeaksInWindow(start, end) {
 }
 
 
-function detectPeaksWithSlidingWindow(windowSize, step) {
+function detectPeaksWithSlidingWindow(signal) {
     let allPeaks = [];
 
-    for (let start = 0; start < ECGsignal.length - windowSize; start += step) {
-        let end = start + windowSize;
-        let peaks = detectPeaksInWindow(start, end);
+    let windowSize = 10 * SAMPLE_RATE_HZ; // 10 segundos
+
+    for (let i = 0; i < signal.length - windowSize; i += windowSize) {
+        let end = i + windowSize;
+        let peaks = detectPeaksInWindow(i, end);
         allPeaks.push(...peaks);
     }
 
@@ -131,8 +180,8 @@ function updateTachogramPlot(tacoTimeArray, rrIntervals) {
 
 function updatePlots() {
     updateECGPlot();
-
-    const data = detectPeaksWithSlidingWindow(windowSizeSlider.value, 10);
+    outputSignal = reducedPamTompkins(ECGsignal);
+    const data = detectPeaksWithSlidingWindow(outputSignal);
     calculateRRIntervals(data.allPeaks, data.tacoTimeArray);
     updateTachogramPlot(data.tacoTimeArray, rrIntervals);
 }
@@ -140,7 +189,7 @@ function updatePlots() {
 function calculateBPM() {
     let alertView = document.getElementById('alert');
     let moreInfoButton = document.getElementById('more-info-button');
-    
+
     if (rrIntervals.length === 0) {
         document.getElementById('bpm-result').innerText = "N/A";
         alertView.innerText = "Not enough peaks to calculate BPM.";

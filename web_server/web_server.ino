@@ -6,10 +6,12 @@
 const char *SSID = "sergi";
 const char *PASSWORD = "sergio17";
 
-const unsigned long TIMER_DELAY = 2; //ms
-unsigned long lastReadingTime = 0;
+const unsigned long TIMER_DELAY = 5; //ms
+const unsigned int REQUEST_INTERVAL_MS = 500;
+const unsigned int BUFFER_SIZE = REQUEST_INTERVAL_MS / TIMER_DELAY;
 
-unsigned int buffer[250];
+float buffer[BUFFER_SIZE];
+unsigned long lastReadingTime = 0;
 
 AsyncWebServer server(80);
 
@@ -62,8 +64,8 @@ void loop() {
 
 void readSensorValue() {
   if ((millis() - lastReadingTime) > TIMER_DELAY) {
-    unsigned int sensorValue = analogRead(A0);
-    for (int i = 0; i < 249; i++) {
+    float sensorValue = (float) analogRead(A0) * (3.3 / 1024) ;
+    for (int i = 0; i < BUFFER_SIZE - 1; i++) {
       buffer[i] = buffer[i+1];
     }
     buffer[249] = sensorValue;
