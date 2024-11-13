@@ -68,7 +68,7 @@ void readSensorValue() {
     for (int i = 0; i < BUFFER_SIZE - 1; i++) {
       buffer[i] = buffer[i+1];
     }
-    buffer[249] = sensorValue;
+    buffer[BUFFER_SIZE - 1] = sensorValue;
     lastReadingTime = millis();
   }
 }
