@@ -8,10 +8,8 @@ const char *PASSWORD = "enzo2021";
 
 const unsigned long TIMER_DELAY = 2; //ms
 unsigned long lastReadingTime = 0;
-String sensorValue = "0";
 
-
-
+unsigned int buffer[250];
 
 AsyncWebServer server(80);
 
@@ -52,7 +50,7 @@ void loop() {
 
 void readSensorValue() {
   if ((millis() - lastReadingTime) > TIMER_DELAY) {
-    sensorValue = String(analogRead(A0));
+    unsigned int sensorValue = analogRead(A0);
     lastReadingTime = millis();
   }
 }
