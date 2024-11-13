@@ -81,9 +81,7 @@ function derivative_and_squaring(signal) {
         signal[i] = signal[i] ** 2;
     }
 
-    signal = signal.slice(0, signal.length - 1);
-
-    return signal;
+    return signal.slice(0, signal.length - 1);
 }
 
 function moving_window_integration(signal) {
