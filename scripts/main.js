@@ -70,7 +70,9 @@ function reducedPamTompkins(signal) {
 
     let integratedSignal = moving_window_integration(diffSquaredSignal);
 
-    return integratedSignal;
+    let thresholdedSignal = threshold_and_decision(integratedSignal);
+
+    return thresholdedSignal;
 
 }
 
@@ -107,7 +109,12 @@ function moving_window_integration(signal) {
     return outputSignal;
 }
 
-function threshold(signal) {
+function threshold_and_decision(signal) {
+
+    // TODO: umbralizar en Pam-Tompkins
+    // TODO: detectar picos
+
+    return signal;
 
 }
 
