@@ -264,8 +264,6 @@ function findPeaks(signal, windowSize, threshold) {
         }
     }
 
-    console.log('Start index:', startIdx);
-
     for (let i = startIdx; i < signal.length; i += windowSize) {
         const window = signal.slice(i, i + windowSize);
         const windowMax = max(window);

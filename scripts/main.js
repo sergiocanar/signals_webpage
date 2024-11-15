@@ -12,6 +12,10 @@ let timeCounter = 0;
 let ECGsignal = [];
 let timeArray = [];
 let rrIntervals = [];
+let integralSignal = [];
+let peaks = [];
+let tachogramTimeArray = [];
+let newData = [];
 
 let ecgChart;
 let tachogramChart;
@@ -21,7 +25,7 @@ function fetchBuffer() {
     fetch(BUFFER_ROUTE)
         .then(response => response.json())
         .then(buffer => {
-            buffer.map(value => updateBuffers(parseFloat(value)));
+            updateBuffers(buffer);
             updateView();
         })
         .catch(error => console.error('Error fetching sensor value:', error));
@@ -92,6 +96,7 @@ function initializePeaksChart() {
 }
 
 function updateECGChart() {
+    // TODO: update ECG chart with new data that comes in buffer
     const newECGPoint = [
         timeArray[timeArray.length - 1],
         ECGsignal[ECGsignal.length - 1]
@@ -99,147 +104,159 @@ function updateECGChart() {
     ecgChart.series[0].addPoint(newECGPoint, true, ecgChart.series[0].data.length >= bufferSize);
 }
 
-function updateTachogramChart(tacoTimeArray, rrIntervals) {
+function updateTachogramChart() {
+    // TODO: update with new data that comes in buffer
     if (rrIntervals.length > 0) {
         const newTachoPoint = [
-            tacoTimeArray[tacoTimeArray.length - 1],
+            tachogramTimeArray[tachogramTimeArray.length - 1],
             rrIntervals[rrIntervals.length - 1]
         ];
         tachogramChart.series[0].addPoint(newTachoPoint, true, tachogramChart.series[0].data.length >= bufferSize);
     }
 }
 
-function updatePeaksChart(integralSignal, peaks) {
+function updatePeaksChart() {
+    // TODO: update peaks chart correctly
     peaksChart.series[0].setData(integralSignal, true);
     peaksChart.series[1].setData(peaks.map(peak => [timeArray[peak], integralSignal[peak]]), true);
 }
 
-function updateBuffers(sensorValue) {
-    ECGsignal.push(sensorValue);
-    timeCounter += samplePeriodMs / 1000;
-    timeArray.push(timeCounter);
-    if (ECGsignal.length > bufferSize) {
-        ECGsignal.shift();
-        timeArray.shift();
+function updateBuffers(buffer) {
+    newData = [];
+    for (let i = 0; i < buffer.length; i++) {
+        let sensorValue = parseFloat(buffer[i]);
+        newData.push(sensorValue);
+        timeCounter += samplePeriodMs / 1000;
+        timeArray.push(timeCounter);
+        if (ECGsignal.length > bufferSize) {
+            timeArray.shift();
+        }
     }
 }
 
-function updateView() {
-    updatePlots();
-    calculateBPM();
+function reducedPamTompkins(newData) {
+
+    const filteredECG = applyMovingAverage(newData, 5);
+    ECGsignal = ECGsignal.concat(filteredECG);
+
+    const diffSignal = diffAndSquare(filteredECG);
+
+    // TODO: seleccionar automatica y matematicamente el tamaño de la ventana
+    const newIntegralSignal = slidingWindowIntegration(diffSignal, samplePeriodMs, 0.055);
+    
+    integralSignal = integralSignal.concat(newIntegralSignal);
+    if (integralSignal.length > bufferSize) {
+        integralSignal = integralSignal.slice(integralSignal.length - bufferSize);
+    }
+
+    // TODO: seleccionar automatica y matematicamente el tamaño de la ventana y el umbral
+    const newPeaks = findPeaks(newIntegralSignal, 120, 600);
+    
+    ECGsignal = ECGsignal.concat(newData);
+    peaks = peaks.concat(newPeaks);
+    if (ECGsignal.length > bufferSize) {
+        for (let i = 0; i < peaks.length; i++) {
+            let newIdx = peaks[i] - bufferSize;
+            if (newIdx >= 0) {
+                peaks[i] = newIdx;
+            }
+            else {
+                peaks.shift();
+            }
+        }
+        ECGsignal = ECGsignal.slice(ECGsignal.length - bufferSize);
+    }
+
+    const newTachogram = calculateTachogram(newPeaks, sampleRateHz);
+    rrIntervals = rrIntervals.concat(newTachogram);
+    if (rrIntervals.length > bufferSize) {
+        rrIntervals = rrIntervals.slice(rrIntervals.length - bufferSize);
+    }
+
 }
 
-function reducedPamTompkins(signal) {
-
-    let baseSignal = Array.from(signal);
-
-    let diffSquaredSignal = diffAndSquare(baseSignal);
-
-    let integratedSignal = movingWindowIntegration(diffSquaredSignal);
-
-    let thresholdedSignal = threshold_and_decision(integratedSignal);
-    updateOtherPlots(diffSquaredSignal, integratedSignal, thresholdedSignal);
-    return thresholdedSignal;
-
+function applyMovingAverage(signal, windowSize = 5) {
+    const filtered = [];
+    for (let i = 0; i < signal.length; i++) {
+        let sum = 0;
+        let count = 0;
+        for (let j = i - Math.floor(windowSize / 2); j <= i + Math.floor(windowSize / 2); j++) {
+            if (j >= 0 && j < signal.length) {
+                sum += signal[j];
+                count++;
+            }
+        }
+        filtered.push(sum / count);
+    }
+    return filtered;
 }
 
 function diffAndSquare(signal) {
+    const diffSignal = [];
 
     for (let i = 0; i < signal.length - 1; i++) {
-        signal[i] = (signal[i + 1] - signal[i]) / (samplePeriodMs / 1000);
-        signal[i] = signal[i] ** 2;
+        diffSignal.push(Math.pow(signal[i + 1] - signal[i], 2));
     }
 
-    return signal.slice(0, signal.length - 1);
+    return diffSignal;
 }
 
-function movingWindowIntegration(signal) {
+function slidingWindowIntegration(signal, samplePeriod, windowSize) {
 
-    let windowSize = 0.03; // 30  ms (tomado del artículo oficial del algoritmo para un sample rate de 200 Hz)
-
-    let halfWindowSize = Math.floor(windowSize / 2);
-    let nSamplesInHalfWindow = Math.round(halfWindowSize / (samplePeriodMs / 1000));
-    let outputSignal = Array(signal.length).fill(0);
-
+    const newIntegralSignal = [];
+    const halfWindow = windowSize / 2;
+    const nSamplesInHalfWindow = Math.floor(halfWindow / samplePeriod);
     for (let i = 0; i < signal.length; i++) {
-        start_i = i - nSamplesInHalfWindow;
-        end_i = i + nSamplesInHalfWindow;
-        if (start_i < 0) {
-            start_i = 0;
+        let startIdx = i - nSamplesInHalfWindow;
+        let endIdx = i + nSamplesInHalfWindow;
+
+        if (startIdx < 0) {
+            startIdx = 0;
         }
-        if (end_i > signal.length) {
-            end_i = signal.length;
+        if (endIdx >= signal.length) {
+            endIdx = signal.length - 1;
         }
-        outputSignal = mean(signal.slice(start_i, end_i));
+
+        const window = signal.slice(startIdx, endIdx);
+        newIntegralSignal.push(mean(window));
     }
 
-    return outputSignal;
-}
+    return newIntegralSignal;
 
-function threshold_and_decision(signal) {
-
-    // TODO: umbralizar en Pam-Tompkins
-    // TODO: detectar picos
-
-    return signal;
-
-}
-
-
-// TODO: revise peak detection
-function detectPeaksInWindow(start, end) {
-    let peaks = [];
-    let window = ECGsignal.slice(start, end);
-
-    for (let i = 1; i < window.length - 1; i++) {
-        if (window[i] > window[i - 1] && window[i] > window[i + 1]) {
-            peaks.push(start + i);
-        }
-    }
-    return peaks;
-}
-
-
-function detectPeaksWithSlidingWindow(signal) {
-    let allPeaks = [];
-
-    let windowSize = 10 * sampleRateHz; // 10 segundos
-
-    for (let i = 0; i < signal.length - windowSize; i += windowSize) {
-        let end = i + windowSize;
-        let peaks = detectPeaksInWindow(i, end);
-        allPeaks.push(...peaks);
-    }
-
-    return { allPeaks, tacoTimeArray: timeArray.slice(allPeaks[1]) };
 }
 
 function mean(arr) {
     return arr.reduce((sum, value) => sum + value, 0) / arr.length;
 }
 
-function std(arr, meanVal) {
-    let variance = arr.reduce((sum, value) => sum + Math.pow(value - meanVal, 2), 0) / arr.length;
-    return Math.sqrt(variance);
+function max(signal) {
+    let maxVal = signal[0];
+    for (let i = 1; i < signal.length; i++) {
+        if (signal[i] > maxVal) {
+            maxVal = signal[i];
+        }
+    }
+    return maxVal;
 }
 
-function calculateRRIntervals(peaks, timeArray) {
-    rrIntervals = [];
+function calculateTachogram(peaks, sampleRate) {
+    const newTachogram = [];
 
-    if (peaks.length < 2) return;
+    if (peaks.length < 2) return [];
 
     for (let i = 1; i < peaks.length; i++) {
-        let rr = (timeArray[peaks[i]] - timeArray[peaks[i - 1]]) / 1000;
-        if (rr > 0) rrIntervals.push(rr);
+        const RR = (peaks[i] - peaks[i - 1]) / sampleRate;
+        newTachogram.push(RR);
     }
+    return newTachogram;
 }
 
-function updatePlots() {
+function updateView(newData) {
+    reducedPamTompkins(newData);
     updateECGChart();
-    outputSignal = reducedPamTompkins(ECGsignal);
-    const data = detectPeaksWithSlidingWindow(outputSignal);
-    calculateRRIntervals(data.allPeaks, data.tacoTimeArray);
-    updateTachogramChart(data.tacoTimeArray, rrIntervals);
+    updateTachogramChart();
+    updatePeaksChart();
+    calculateBPM()
 }
 
 function calculateBPM() {
@@ -312,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeECGChart();
     initializeTachogramChart();
     initializePeaksChart();
-    updateView();
 });
 
 fetchSampleInterval();
