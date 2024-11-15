@@ -32,41 +32,35 @@ function initializeTachogramChart() {
     tachogramChart = Highcharts.chart('tachogram-container', {
         chart: { type: 'line', animation: false },
         title: { text: 'Tachogram' },
-        xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
+        xAxis: { title: { text: 'Beats' } },
         yAxis: { title: { text: 'RR-interval (seconds)' } },
         series: [{ name: 'RR-interval', data: [] }],
         plotOptions: { series: { marker: { enabled: false } } }
     });
 }
 
-function initializeOtherCharts() {
-    derivateChart = Highcharts.chart('derivative-container', {
+function initializePeaksChart() {
+    Highcharts.chart('peaks-container', {
         chart: { type: 'line', animation: false },
-        title: { text: 'Squared Derivative' },
-        xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
-        yAxis: { title: { text: 'Squared Derivate' } },
-        series: [{ name: 'Derivative', data: [] }],
-        plotOptions: { series: { marker: { enabled: false } } }
-    });
-
-    integralChart = Highcharts.chart('integral-container', {
-        chart: { type: 'line', animation: false },
-        title: { text: 'Integral' },
-        xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
-        yAxis: { title: { text: 'Integral' } },
-        series: [{ name: 'Integral', data: [] }],
-        plotOptions: { series: { marker: { enabled: false } } }
-    });
-
-    thresholdChart = Highcharts.chart('threshold-container', {
-        chart: { type: 'line', animation: false },
-        title: { text: 'Threshold' },
-        xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
-        yAxis: { title: { text: 'Threshold' } },
-        series: [{ name: 'Threshold', data: [] }],
-        plotOptions: { series: { marker: { enabled: false } } }
+        title: { text: 'Integrated Signal with Peaks' },
+        xAxis: { title: { text: 'Time (seconds)' } },
+        yAxis: { title: { text: 'Amplitude' } },
+        legend: { enabled: true }, 
+        series: [
+            { name: 'Integrated Signal', data: [], lineWidth: 1 },
+            {
+                type: 'scatter',
+                name: 'Peaks',
+                data: [],
+                color: 'red',
+                marker: {
+                    radius: 4
+                }
+            }
+        ]
     });
 }
+
 
 function updateECGChart() {
     const newECGPoint = [
@@ -86,18 +80,9 @@ function updateTachogramChart(tacoTimeArray, rrIntervals) {
     }
 }
 
-function updateOtherPlots(derivative, integral, threshold) {
-    for (let i = 0; i < derivative.length; i++) {
-        derivateChart.series[0].addPoint([timeArray[i], derivative[i]], true, derivateChart.series[0].data.length >= BUFFER_SIZE);
-    }
-    for (let i = 0; i < integral.length; i++) {
-        integralChart.series[0].addPoint([timeArray[i], integral[i]], true, integralChart.series[0].data.length >= BUFFER_SIZE);
-    }
-    for (let i = 0; i < threshold.length; i++) {
-        thresholdChart.series[0].addPoint([timeArray[i], threshold[i]], true, thresholdChart.series[0].data.length >= BUFFER_SIZE);
-    }
+function updatePeaksChart(integralSignal, peaks) {
+    if 
 }
-    
 
 function updateBuffers(sensorValue) {
     ECGsignal.push(sensorValue);
@@ -306,6 +291,7 @@ window.onclick = function (event) {
 document.addEventListener('DOMContentLoaded', () => {
     initializeECGChart();
     initializeTachogramChart();
+    initializePeaksChart();
     updateView();
 });
 

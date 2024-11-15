@@ -563,9 +563,9 @@ function reducedPamTompkins(signal) {
 
     let baseSignal = Array.from(signal);
 
-    let diffSquaredSignal = derivative_and_squaring(baseSignal);
+    let diffSquaredSignal = diffAndSquare(baseSignal);
 
-    let integratedSignal = moving_window_integration(diffSquaredSignal);
+    let integratedSignal = movingWindowIntegration(diffSquaredSignal);
 
     let thresholdedSignal = threshold_and_decision(integratedSignal);
     updateOtherPlots(diffSquaredSignal, integratedSignal, thresholdedSignal);
@@ -573,7 +573,7 @@ function reducedPamTompkins(signal) {
 
 }
 
-function derivative_and_squaring(signal) {
+function diffAndSquare(signal) {
 
     for (let i = 0; i < signal.length - 1; i++) {
         signal[i] = (signal[i + 1] - signal[i]) / (SAMPLE_PERIOD_MS / 1000);
@@ -583,17 +583,17 @@ function derivative_and_squaring(signal) {
     return signal.slice(0, signal.length - 1);
 }
 
-function moving_window_integration(signal) {
+function movingWindowIntegration(signal) {
 
-    let window_size = 0.03; 
+    let windowSize = 0.03; 
 
-    let half_window_size = Math.floor(window_size / 2);
-    let n_samples_in_half_window = Math.round(half_window_size / (SAMPLE_PERIOD_MS / 1000));
+    let halfWindowSize = Math.floor(windowSize / 2);
+    let nSamplesInHalfWindow = Math.round(halfWindowSize / (SAMPLE_PERIOD_MS / 1000));
     let outputSignal = Array(signal.length).fill(0);
 
     for (let i = 0; i < signal.length; i++) {
-        start_i = i - n_samples_in_half_window;
-        end_i = i + n_samples_in_half_window;
+        start_i = i - nSamplesInHalfWindow;
+        end_i = i + nSamplesInHalfWindow;
         if (start_i < 0) {
             start_i = 0;
         }
@@ -614,6 +614,8 @@ function threshold_and_decision(signal) {
     return signal;
 
 }
+
+
 
 function detectPeaksInWindow(start, end) {
     let peaks = [];
