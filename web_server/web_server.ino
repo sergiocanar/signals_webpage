@@ -6,9 +6,9 @@
 const char *SSID = "ColdPalmer";
 const char *PASSWORD = "david4567";
 
-const unsigned long TIMER_DELAY_MS = 5;
+const unsigned long SAMPLE_PERIOD_MS = 5;
 const unsigned int REQUEST_INTERVAL_MS = 500;
-const unsigned int BUFFER_SIZE = REQUEST_INTERVAL_MS / TIMER_DELAY_MS;
+const unsigned int BUFFER_SIZE = REQUEST_INTERVAL_MS / SAMPLE_PERIOD_MS;
 
 float dataBuffer[BUFFER_SIZE];
 unsigned long lastReadingTime = 0;
@@ -35,6 +35,14 @@ void setup() {
     request->send_P(200, "text/html", index_html);
   });
 
+  server.on("/request_interval_ms", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send_P(200, "text/plain", String(REQUEST_INTERVAL_MS).c_str());
+  });
+  
+  server.on("/sample_period", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send_P(200, "text/plain", String(SAMPLE_PERIOD_MS).c_str());
+  });
+
   server.on("/buffer", HTTP_GET, [](AsyncWebServerRequest *request) {
     String json = "[";
     for (int i = 0; i < BUFFER_SIZE; i++) {
@@ -59,7 +67,7 @@ void loop() {
 }
 
 void readSensorValue() {
-  if ((millis() - lastReadingTime) > TIMER_DELAY_MS) {
+  if ((millis() - lastReadingTime) > SAMPLE_PERIOD_MS) {
     float sensorValue = 1000 * (float)analogRead(A0) * (3.3 / 1024);  // en mV
     for (int i = 0; i < BUFFER_SIZE - 1; i++) {
       dataBuffer[i] = dataBuffer[i + 1];
