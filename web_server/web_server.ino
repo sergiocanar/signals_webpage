@@ -61,7 +61,6 @@ void loop() {
 void readSensorValue() {
   if ((millis() - lastReadingTime) > TIMER_DELAY_MS) {
     float sensorValue = 1000 * (float)analogRead(A0) * (3.3 / 1024);  // en mV
-    //Serial.println(sensorValue);
     for (int i = 0; i < BUFFER_SIZE - 1; i++) {
       dataBuffer[i] = dataBuffer[i + 1];
     }
