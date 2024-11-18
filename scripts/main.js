@@ -60,7 +60,7 @@ async function initializeData() {
     await fetchSampleInterval();
     await fetchSamplePeriod();
 
-    console.log('Initialization complete');
+    console.log('Parameter initialization complete');
     console.log({
         requestIntervalMs,
         samplePeriodMs,
@@ -152,7 +152,7 @@ function updateBuffers(buffer) {
     }
 }
 
-function reducedPamTompkins(newData) {
+function reducedPamTompkins() {
 
     const filteredECG = applyMovingAverage(newData, 5);
     ECGsignal = ECGsignal.concat(filteredECG);
@@ -300,8 +300,7 @@ function calculateTachogram(peaks, sampleRate) {
 }
 
 function updateView() {
-    console.log('New data:', newData);
-    reducedPamTompkins(newData);
+    reducedPamTompkins();
     updateECGChart();
     updateTachogramChart();
     updatePeaksChart();
