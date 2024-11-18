@@ -21,34 +21,52 @@ let ecgChart;
 let tachogramChart;
 let peaksChart;
 
-function fetchBuffer() {
-    fetch(BUFFER_ROUTE)
-        .then(response => response.json())
-        .then(buffer => {
-            updateBuffers(buffer);
-            updateView();
-        })
-        .catch(error => console.error('Error fetching sensor value:', error));
+async function fetchBufferAndUpdateView() {
+    try {
+        const response = await fetch(BUFFER_ROUTE);
+        const text = await response.text();
+        const buffer = text.split(',');
+
+        updateBuffers(buffer);
+        updateView();
+    } catch (error) {
+        console.error('Error fetching sensor value:', error);
+    }
 }
 
-function fetchSampleInterval() {
-    fetch(REQUEST_INTERVAL_MS_ROUTE)
-        .then(response => response.text())
-        .then(data => {
-            requestIntervalMs = parseInt(data);
-        })
-        .catch(error => console.error('Error fetching sample interval:', error));
+async function fetchSampleInterval() {
+    try {
+        const response = await fetch(REQUEST_INTERVAL_MS_ROUTE);
+        const data = await response.text();
+        requestIntervalMs = parseInt(data);
+    } catch (error) {
+        console.error('Error fetching sample interval:', error);
+    }
 }
 
-function fetchSamplePeriod() {
-    fetch(SAMPLE_PERIOD_ROUTE)
-        .then(response => response.text())
-        .then(data => {
-            samplePeriodMs = parseInt(data);
-            sampleRateHz = Math.round(1 / (samplePeriodMs / 1000));
-            bufferSize = SECONDS_TO_STORE * sampleRateHz;
-        })
-        .catch(error => console.error('Error fetching sample period:', error));
+async function fetchSamplePeriod() {
+    try {
+        const response = await fetch(SAMPLE_PERIOD_ROUTE);
+        const data = await response.text();
+        samplePeriodMs = parseInt(data);
+        sampleRateHz = Math.round(1 / (samplePeriodMs / 1000));
+        bufferSize = SECONDS_TO_STORE * sampleRateHz;
+    } catch (error) {
+        console.error('Error fetching sample period:', error);
+    }
+}
+
+async function initializeData() {
+    await fetchSampleInterval();
+    await fetchSamplePeriod();
+
+    console.log('Initialization complete');
+    console.log({
+        requestIntervalMs,
+        samplePeriodMs,
+        sampleRateHz,
+        bufferSize
+    });
 }
 
 function initializeECGChart() {
@@ -143,7 +161,7 @@ function reducedPamTompkins(newData) {
 
     // TODO: seleccionar automatica y matematicamente el tamaño de la ventana
     const newIntegralSignal = slidingWindowIntegration(diffSignal, samplePeriodMs, 0.055);
-    
+
     integralSignal = integralSignal.concat(newIntegralSignal);
     if (integralSignal.length > bufferSize) {
         integralSignal = integralSignal.slice(integralSignal.length - bufferSize);
@@ -151,7 +169,7 @@ function reducedPamTompkins(newData) {
 
     // TODO: seleccionar automatica y matematicamente el tamaño de la ventana y el umbral
     const newPeaks = findPeaks(newIntegralSignal, 120, 600);
-    
+
     ECGsignal = ECGsignal.concat(newData);
     peaks = peaks.concat(newPeaks);
     if (ECGsignal.length > bufferSize) {
@@ -239,6 +257,36 @@ function max(signal) {
     return maxVal;
 }
 
+function findPeaks(signal, windowSize, threshold) {
+    const peakIndices = [];
+
+    let firstPeakFound = false;
+    let startIdx = 0;
+    let searchIdx = 0;
+    while (!firstPeakFound && searchIdx < signal.length) {
+        const window = signal.slice(searchIdx, searchIdx + windowSize);
+        const windowMax = max(window);
+        if (windowMax > threshold) {
+            firstPeakFound = true;
+            peakIndices.push(searchIdx + window.indexOf(windowMax));
+            startIdx = searchIdx + Math.floor(windowSize / 2);
+        }
+        else {
+            searchIdx += windowSize;
+        }
+    }
+
+    for (let i = startIdx; i < signal.length; i += windowSize) {
+        const window = signal.slice(i, i + windowSize);
+        const windowMax = max(window);
+        if (windowMax > threshold) {
+            peakIndices.push(i + window.indexOf(windowMax));
+        }
+    }
+
+    return peakIndices;
+}
+
 function calculateTachogram(peaks, sampleRate) {
     const newTachogram = [];
 
@@ -251,7 +299,8 @@ function calculateTachogram(peaks, sampleRate) {
     return newTachogram;
 }
 
-function updateView(newData) {
+function updateView() {
+    console.log('New data:', newData);
     reducedPamTompkins(newData);
     updateECGChart();
     updateTachogramChart();
@@ -331,6 +380,19 @@ document.addEventListener('DOMContentLoaded', () => {
     initializePeaksChart();
 });
 
-fetchSampleInterval();
-fetchSamplePeriod();
-setInterval(fetchBuffer, requestIntervalMs);
+initializeData()
+    .then(() => {
+        console.log('Data initialization complete. All global variables are updated.');
+
+        setInterval(
+            async () => {
+                await fetchBufferAndUpdateView();
+            },
+            requestIntervalMs
+        );
+
+        console.log(`Fetching buffer every ${requestIntervalMs} ms`);
+    })
+    .catch(error => {
+        console.error('Error during data initialization:', error);
+    });

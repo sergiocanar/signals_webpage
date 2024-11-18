@@ -44,15 +44,14 @@ void setup() {
   });
 
   server.on("/buffer", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String json = "[";
+    String bufferStr = "";
     for (int i = 0; i < BUFFER_SIZE; i++) {
-      json += String(dataBuffer[i]);
+      bufferStr += String(dataBuffer[i]);
       if (i < BUFFER_SIZE - 1) {
-        json += ",";
+        bufferStr += ",";
       }
     }
-    json += "]";
-    request->send(200, "application/json", json);
+    request->send(200, "text/plain", bufferStr.c_str());
   });
 
   server.begin();
