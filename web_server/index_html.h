@@ -382,11 +382,12 @@ button:hover {
             </div>
             <hr>
             <div class='row'>
-                <div class='col-6'></div>
+                <div class='col-6'>
                     <div id='bpm-container'>
                         <h3 id='bpm-result'></h3>
                         <h3 id='alert'></h3>
                     </div>
+                </div>
                 <div class='col-6'>
                     <div class='d-flex justify-content-center'>
                         <button id='more-info-button' class='btn btn-primary'>Get more information about my state</button>
