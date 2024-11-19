@@ -510,7 +510,7 @@ function initializeTachogramChart() {
 }
 
 function initializePeaksChart() {
-    tachogramChart = Highcharts.chart('peaks-container', {
+    peaksChart = Highcharts.chart('peaks-container', { 
         chart: { type: 'line', animation: false },
         title: { text: 'Integrated Signal with Peaks' },
         xAxis: { title: { text: 'Time (seconds)' } },
@@ -530,6 +530,7 @@ function initializePeaksChart() {
         ]
     });
 }
+
 
 function updateECGChart() {
     
@@ -586,28 +587,11 @@ function reducedPamTompkins() {
     }
 
     
-    const newPeaks = findPeaks(newIntegralSignal, 120, 600);
+    peaks = findPeaks(integralSignal, 120, 600);
 
-    ECGsignal = ECGsignal.concat(newData);
-    peaks = peaks.concat(newPeaks);
-    if (ECGsignal.length > bufferSize) {
-        for (let i = 0; i < peaks.length; i++) {
-            let newIdx = peaks[i] - bufferSize;
-            if (newIdx >= 0) {
-                peaks[i] = newIdx;
-            }
-            else {
-                peaks.shift();
-            }
-        }
-        ECGsignal = ECGsignal.slice(ECGsignal.length - bufferSize);
-    }
+    rrIntervals = calculateTachogram(peaks, sampleRateHz);
 
-    const newTachogram = calculateTachogram(newPeaks, sampleRateHz);
-    rrIntervals = rrIntervals.concat(newTachogram);
-    if (rrIntervals.length > bufferSize) {
-        rrIntervals = rrIntervals.slice(rrIntervals.length - bufferSize);
-    }
+    calculateBPM();
 
 }
 
