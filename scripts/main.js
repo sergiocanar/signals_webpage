@@ -115,29 +115,40 @@ function initializePeaksChart() {
 
 
 function updateECGChart() {
-    // TODO: update ECG chart with new data that comes in buffer
-    const newECGPoint = [
-        timeArray[timeArray.length - 1],
-        ECGsignal[ECGsignal.length - 1]
-    ];
-    ecgChart.series[0].addPoint(newECGPoint, true, ecgChart.series[0].data.length >= bufferSize);
+    for (let i = 0; i < newData.length; i++) {
+        const newECGPoint = [
+            timeArray[timeArray.length - newData.length + i],
+            newData[i]
+        ];
+        ecgChart.series[0].addPoint(newECGPoint, true, ecgChart.series[0].data.length >= bufferSize);
+    }
 }
 
 function updateTachogramChart() {
     // TODO: update with new data that comes in buffer
-    if (rrIntervals.length > 0) {
+    for (let i = 0; i < rrIntervals.length; i++) {
         const newTachoPoint = [
-            tachogramTimeArray[tachogramTimeArray.length - 1],
-            rrIntervals[rrIntervals.length - 1]
+            tachogramTimeArray[tachogramTimeArray.length - rrIntervals.length + i],
+            rrIntervals[i]
         ];
         tachogramChart.series[0].addPoint(newTachoPoint, true, tachogramChart.series[0].data.length >= bufferSize);
     }
 }
 
-function updatePeaksChart() {
-    // TODO: update peaks chart correctly
-    peaksChart.series[0].setData(integralSignal, true);
-    peaksChart.series[1].setData(peaks.map(peak => [timeArray[peak], integralSignal[peak]]), true);
+function updatePeaksChart(newIntegralSignal) {
+    for (let i = 0; i < newIntegralSignal.length; i++) {
+        const newIntegralPoint = [
+            timeArray[timeArray.length - newIntegralSignal.length + i],
+            newIntegralSignal[i]
+        ];
+        peaksChart.series[0].addPoint(newIntegralPoint, true, peaksChart.series[0].data.length >= bufferSize);
+    }
+
+    const peakPoints = peaks.map(peakIndex => [
+        timeArray[peakIndex],
+        integralSignal[peakIndex]
+    ]);
+    peaksChart.series[1].setData(peakPoints, true);
 }
 
 function updateBuffers(buffer) {
@@ -162,7 +173,7 @@ function reducedPamTompkins() {
 
     // TODO: seleccionar automatica y matematicamente el tamaño de la ventana
     const newIntegralSignal = slidingWindowIntegration(diffSignal, samplePeriodMs, 0.055);
-
+    console.log(newIntegralSignal);
     integralSignal = integralSignal.concat(newIntegralSignal);
     if (integralSignal.length > bufferSize) {
         integralSignal = integralSignal.slice(integralSignal.length - bufferSize);
@@ -174,6 +185,8 @@ function reducedPamTompkins() {
     rrIntervals = calculateTachogram(peaks, sampleRateHz);
 
     calculateBPM();
+
+    return newIntegralSignal;
 
 }
 
@@ -207,7 +220,8 @@ function slidingWindowIntegration(signal, samplePeriod, windowSize) {
 
     const newIntegralSignal = [];
     const halfWindow = windowSize / 2;
-    const nSamplesInHalfWindow = Math.floor(halfWindow / samplePeriod);
+    const nSamplesInHalfWindow = Math.ceil(halfWindow / samplePeriod);
+    console.log(nSamplesInHalfWindow);
     for (let i = 0; i < signal.length; i++) {
         let startIdx = i - nSamplesInHalfWindow;
         let endIdx = i + nSamplesInHalfWindow;
@@ -273,22 +287,27 @@ function findPeaks(signal, windowSize, threshold) {
 
 function calculateTachogram(peaks, sampleRate) {
     const newTachogram = [];
+    const newTachogramTimeArray = [];
 
     if (peaks.length < 2) return [];
 
     for (let i = 1; i < peaks.length; i++) {
         const RR = (peaks[i] - peaks[i - 1]) / sampleRate;
         newTachogram.push(RR);
+        newTachogramTimeArray.push(i - 1); // Use the beat index as x-axis
     }
+
+    tachogramTimeArray = newTachogramTimeArray; // Update the global time array
     return newTachogram;
 }
 
+
 function updateView() {
-    reducedPamTompkins();
+    const newIntegralSignal = reducedPamTompkins();
     updateECGChart();
+    updatePeaksChart(newIntegralSignal);
     updateTachogramChart();
-    updatePeaksChart();
-    calculateBPM()
+    calculateBPM();
 }
 
 function calculateBPM() {

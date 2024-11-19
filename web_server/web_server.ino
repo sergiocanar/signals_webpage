@@ -7,7 +7,7 @@ const char *SSID = "ColdPalmer";
 const char *PASSWORD = "david4567";
 
 const unsigned long SAMPLE_PERIOD_MS = 5;
-const unsigned int REQUEST_INTERVAL_MS = 500;
+const unsigned int REQUEST_INTERVAL_MS = 200;
 const unsigned int BUFFER_SIZE = REQUEST_INTERVAL_MS / SAMPLE_PERIOD_MS;
 
 float dataBuffer[BUFFER_SIZE];
