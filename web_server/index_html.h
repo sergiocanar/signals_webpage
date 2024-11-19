@@ -382,21 +382,17 @@ button:hover {
             </div>
             <hr>
             <div class='row'>
-                <div class='col-3'></div>
-                <div class='col-6'>
+                <div class='col-6'></div>
                     <div id='bpm-container'>
                         <h3 id='bpm-result'></h3>
                         <h3 id='alert'></h3>
                     </div>
+                <div class='col-6'>
+                    <div class='d-flex justify-content-center'>
+                        <button id='more-info-button' class='btn btn-primary'>Get more information about my state</button>
+                    </div>
+                    <div style='height: 50px; text-align: center;'></div>
                 </div>
-                <div class='col-3'></div>
-            </div>
-            <div class='row'>
-                <div class='d-flex justify-content-center'>
-                    <button id='more-info-button' class='btn btn-primary'>Get more information about my state</button>
-                </div>
-                <div style='height: 50px; text-align: center;'></div>
-
             </div>
             <div class='row'>
                 <div id='ecg-container'></div>
@@ -489,7 +485,7 @@ async function initializeData() {
     await fetchSampleInterval();
     await fetchSamplePeriod();
 
-    console.log('Initialization complete');
+    console.log('Parameter initialization complete');
     console.log({
         requestIntervalMs,
         samplePeriodMs,
@@ -581,7 +577,7 @@ function updateBuffers(buffer) {
     }
 }
 
-function reducedPamTompkins(newData) {
+function reducedPamTompkins() {
 
     const filteredECG = applyMovingAverage(newData, 5);
     ECGsignal = ECGsignal.concat(filteredECG);
@@ -729,8 +725,7 @@ function calculateTachogram(peaks, sampleRate) {
 }
 
 function updateView() {
-    console.log('New data:', newData);
-    reducedPamTompkins(newData);
+    reducedPamTompkins();
     updateECGChart();
     updateTachogramChart();
     updatePeaksChart();
