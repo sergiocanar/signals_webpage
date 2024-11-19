@@ -3,8 +3,8 @@
 #include <ESPAsyncTCP.h>
 #include "index_html.h"
 
-const char *SSID = "ColdPalmer";
-const char *PASSWORD = "david4567";
+const char *SSID = "sergi";
+const char *PASSWORD = "sergio17";
 
 const unsigned long SAMPLE_PERIOD_MS = 5;
 const unsigned int REQUEST_INTERVAL_MS = 200;

@@ -173,14 +173,14 @@ function reducedPamTompkins() {
 
     // TODO: seleccionar automatica y matematicamente el tamaño de la ventana
     const newIntegralSignal = slidingWindowIntegration(diffSignal, samplePeriodMs, 0.055);
-    console.log(newIntegralSignal);
+    //console.log(newIntegralSignal);
     integralSignal = integralSignal.concat(newIntegralSignal);
     if (integralSignal.length > bufferSize) {
         integralSignal = integralSignal.slice(integralSignal.length - bufferSize);
     }
 
     // TODO: seleccionar automatica y matematicamente el tamaño de la ventana y el umbral
-    peaks = findPeaks(integralSignal, 120, 600);
+    peaks = findPeaks(integralSignal, 120, 2);
 
     rrIntervals = calculateTachogram(peaks, sampleRateHz);
 
@@ -217,33 +217,37 @@ function diffAndSquare(signal) {
 }
 
 function slidingWindowIntegration(signal, samplePeriod, windowSize) {
-
     const newIntegralSignal = [];
     const halfWindow = windowSize / 2;
-    const nSamplesInHalfWindow = Math.ceil(halfWindow / samplePeriod);
-    console.log(nSamplesInHalfWindow);
+    const nSamplesInHalfWindow = Math.round(halfWindow / samplePeriod);
+
     for (let i = 0; i < signal.length; i++) {
         let startIdx = i - nSamplesInHalfWindow;
-        let endIdx = i + nSamplesInHalfWindow;
+        let endIdx = i + nSamplesInHalfWindow + 1;
 
-        if (startIdx < 0) {
-            startIdx = 0;
-        }
-        if (endIdx >= signal.length) {
-            endIdx = signal.length - 1;
-        }
+        // Clamp indices within valid range
+        startIdx = Math.max(0, startIdx);
+        endIdx = Math.min(signal.length, endIdx);
 
         const window = signal.slice(startIdx, endIdx);
-        newIntegralSignal.push(mean(window));
+        if (window.length > 0) { // Ensure window is not empty
+            newIntegralSignal.push(mean(window));
+        } else {
+            newIntegralSignal.push(0); // Default value for empty window
+        }
     }
 
     return newIntegralSignal;
-
 }
+
+
+
 
 function mean(arr) {
+    if (arr.length === 0) return 0; // Return a default value to avoid NaN
     return arr.reduce((sum, value) => sum + value, 0) / arr.length;
 }
+
 
 function max(signal) {
     let maxVal = signal[0];
@@ -255,7 +259,11 @@ function max(signal) {
     return maxVal;
 }
 
-function findPeaks(signal, windowSize, threshold) {
+function findPeaks(signal, windowSize, thresholdMultiplier) {
+    
+    const meanValue = mean(signal);
+    const threshold = meanValue * thresholdMultiplier;
+    
     const peakIndices = [];
 
     let firstPeakFound = false;
@@ -323,7 +331,7 @@ function calculateBPM() {
     }
 
     const avgRRInterval = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
-    const bpm = 0.006 / avgRRInterval;
+    const bpm = 60 / avgRRInterval;
 
     document.getElementById('bpm-result').innerText = bpm.toFixed(2) + " BPM";
     moreInfoButton.style.display = "block";
