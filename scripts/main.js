@@ -78,7 +78,10 @@ function initializeECGChart() {
         title: { text: 'ECG Signal' },
         xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
         yAxis: { title: { text: 'Amplitude (mV)' } },
-        series: [{ name: 'ECG Signal', data: [] }],
+        series: [
+            { name: 'ECG Signal', data: [] },
+            { name: 'Arrhythmias', data: [], color: 'red', type: 'scatter', marker: { radius: 4 } }
+        ],
         plotOptions: { series: { marker: { enabled: false } } }
     });
 }
@@ -167,17 +170,14 @@ function updateBuffers(buffer) {
 }
 
 function plotArrhythmias(arrhythmias) {
+
     arrhythmias.forEach(arrhythmia => {
-        ecgChart.addSeries({
-            name: 'Arrhythmia',
-            data: arrhythmia.data.map((value, index) => [arrhythmia.time[index], value]),
-            color: 'red',
-            lineWidth: 2,
-            marker: {
-                enabled: false
-            }
+        const { data, time } = arrhythmia;
+        data.forEach((value, index) => {
+            ecgChart.series[1].addPoint([time[index], value], true, time[index] >= timeArray[0]);
         });
     });
+    
 }
 
 function reducedPamTompkins() {
