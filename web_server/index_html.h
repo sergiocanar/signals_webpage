@@ -395,7 +395,7 @@ button:hover {
                     <div style='height: 50px; text-align: center;'></div>
                 </div>
                 <div class='col-4'>
-                    <h3 id='arrhythmia-count'></h3>
+                    <h3 id='arrhythmia-count'>No arrhythmia detected</h3>
                 </div>
             </div>
             <div class='row'>
@@ -437,6 +437,8 @@ let sampleRateHz = 0;
 let bufferSize = 0;
 let requestIntervalMs = 0;
 let rrIntervalsMean = 0;
+let lastArrhythmiaCount = 0;
+let arrhythmiaCount = 0;
 
 let timeCounter = 0;
 let ECGsignal = [];
@@ -447,7 +449,6 @@ let peaks = [];
 let tachogramTimeArray = [];
 let newData = [];
 let rrInterestIntervals = [];
-let lastArrhythmiaCount = 0;
 
 let ecgChart;
 let tachogramChart;
@@ -683,8 +684,13 @@ function findArrhythmias() {
     if (arrhythmias.length != lastArrhythmiaCount) {
         lastArrhythmiaCount = arrhythmias.length;
         updateArrhythmiaCountView(arrhythmias.length);
+        arrhythmiaPopup();
     }
     return arrhythmias;
+}
+
+function arrhythmiaPopup() {
+    alert(`Arrhythmias detected. Please notify the user to stop it's activity`);
 }
 
 function updateArrhythmiaCountView(count) {
