@@ -183,24 +183,25 @@ function updateBuffers(buffer) {
 }
 
 function plotArrhythmias(arrhythmias) {
-    // Prepare an array to hold the points that overlap with arrhythmias
     const arrhythmiaPoints = [];
 
+    // Collect arrhythmia points within the current time buffer
     arrhythmias.forEach(arrhythmia => {
         const { data, time } = arrhythmia;
 
         data.forEach((value, index) => {
             const timePoint = time[index];
-            // Check if the time point is within the current buffer
+            // Only include arrhythmias within the current buffer range
             if (timePoint >= timeArray[0] && timePoint <= timeArray[timeArray.length - 1]) {
                 arrhythmiaPoints.push([timePoint, value]);
             }
         });
     });
 
-    // Update the arrhythmia series (series[1]) without affecting the ECG signal (series[0])
+    // Update the arrhythmia series (series[1])
     ecgChart.series[1].setData(arrhythmiaPoints, true);
 }
+
 
 function reducedPamTompkins() {
 

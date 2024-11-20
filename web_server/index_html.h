@@ -609,9 +609,9 @@ function updateBuffers(buffer) {
 }
 
 function plotArrhythmias(arrhythmias) {
-    
     const arrhythmiaPoints = [];
 
+    
     arrhythmias.forEach(arrhythmia => {
         const { data, time } = arrhythmia;
 
@@ -627,6 +627,7 @@ function plotArrhythmias(arrhythmias) {
     
     ecgChart.series[1].setData(arrhythmiaPoints, true);
 }
+
 
 function reducedPamTompkins() {
 
