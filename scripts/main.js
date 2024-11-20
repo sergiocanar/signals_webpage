@@ -227,7 +227,7 @@ function findArrhythmias() {
             arrhythmias.push({data: window, time: timeWindowArray});
         }
     }
-
+    console.log(`Arrhythmias found: ${arrhythmias.length}`);
     return arrhythmias;
 }
 
@@ -266,15 +266,14 @@ function slidingWindowIntegration(signal, samplePeriod, windowSize) {
         let startIdx = i - nSamplesInHalfWindow;
         let endIdx = i + nSamplesInHalfWindow + 1;
 
-        // Clamp indices within valid range
         startIdx = Math.max(0, startIdx);
         endIdx = Math.min(signal.length, endIdx);
 
         const window = signal.slice(startIdx, endIdx);
-        if (window.length > 0) { // Ensure window is not empty
+        if (window.length > 0) {
             newIntegralSignal.push(mean(window));
         } else {
-            newIntegralSignal.push(0); // Default value for empty window
+            newIntegralSignal.push(0);
         }
     }
 
