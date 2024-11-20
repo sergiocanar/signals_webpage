@@ -79,12 +79,25 @@ function initializeECGChart() {
         xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
         yAxis: { title: { text: 'Amplitude (mV)' } },
         series: [
-            { name: 'ECG Signal', data: [] },
-            { name: 'Arrhythmias', data: [], color: 'red', type: 'scatter', marker: { radius: 4 } }
+            { name: 'ECG Signal', data: [] }, // ECG signal series
+            { 
+                name: 'Arrhythmias', 
+                data: [], 
+                color: 'red', 
+                type: 'scatter', 
+                marker: { 
+                    radius: 4, 
+                    enabled: true // Ensure marker is enabled for this series
+                } 
+            }
         ],
-        plotOptions: { series: { marker: { enabled: false } } }
+        plotOptions: {
+            line: { marker: { enabled: false } }, // Applies only to line series
+            scatter: { marker: { enabled: true } } // Explicitly enable markers for scatter series
+        }
     });
 }
+
 
 function initializeTachogramChart() {
     tachogramChart = Highcharts.chart('tachogram-container', {
@@ -170,14 +183,23 @@ function updateBuffers(buffer) {
 }
 
 function plotArrhythmias(arrhythmias) {
+    // Prepare an array to hold the points that overlap with arrhythmias
+    const arrhythmiaPoints = [];
 
     arrhythmias.forEach(arrhythmia => {
         const { data, time } = arrhythmia;
+
         data.forEach((value, index) => {
-            ecgChart.series[1].addPoint([time[index], value], true, time[index] >= timeArray[0]);
+            const timePoint = time[index];
+            // Check if the time point is within the current buffer
+            if (timePoint >= timeArray[0] && timePoint <= timeArray[timeArray.length - 1]) {
+                arrhythmiaPoints.push([timePoint, value]);
+            }
         });
     });
-    
+
+    // Update the arrhythmia series (series[1]) without affecting the ECG signal (series[0])
+    ecgChart.series[1].setData(arrhythmiaPoints, true);
 }
 
 function reducedPamTompkins() {

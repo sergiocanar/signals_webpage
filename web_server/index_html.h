@@ -504,10 +504,26 @@ function initializeECGChart() {
         title: { text: 'ECG Signal' },
         xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
         yAxis: { title: { text: 'Amplitude (mV)' } },
-        series: [{ name: 'ECG Signal', data: [] }],
-        plotOptions: { series: { marker: { enabled: false } } }
+        series: [
+            { name: 'ECG Signal', data: [] }, 
+            { 
+                name: 'Arrhythmias', 
+                data: [], 
+                color: 'red', 
+                type: 'scatter', 
+                marker: { 
+                    radius: 4, 
+                    enabled: true 
+                } 
+            }
+        ],
+        plotOptions: {
+            line: { marker: { enabled: false } }, 
+            scatter: { marker: { enabled: true } } 
+        }
     });
 }
+
 
 function initializeTachogramChart() {
     tachogramChart = Highcharts.chart('tachogram-container', {
@@ -593,17 +609,23 @@ function updateBuffers(buffer) {
 }
 
 function plotArrhythmias(arrhythmias) {
+    
+    const arrhythmiaPoints = [];
+
     arrhythmias.forEach(arrhythmia => {
-        ecgChart.addSeries({
-            name: 'Arrhythmia',
-            data: arrhythmia.data.map((value, index) => [arrhythmia.time[index], value]),
-            color: 'red',
-            lineWidth: 2,
-            marker: {
-                enabled: false
+        const { data, time } = arrhythmia;
+
+        data.forEach((value, index) => {
+            const timePoint = time[index];
+            
+            if (timePoint >= timeArray[0] && timePoint <= timeArray[timeArray.length - 1]) {
+                arrhythmiaPoints.push([timePoint, value]);
             }
         });
     });
+
+    
+    ecgChart.series[1].setData(arrhythmiaPoints, true);
 }
 
 function reducedPamTompkins() {
@@ -653,7 +675,7 @@ function findArrhythmias() {
             arrhythmias.push({data: window, time: timeWindowArray});
         }
     }
-
+    console.log(`Arrhythmias found: ${arrhythmias.length}`);
     return arrhythmias;
 }
 
@@ -692,15 +714,14 @@ function slidingWindowIntegration(signal, samplePeriod, windowSize) {
         let startIdx = i - nSamplesInHalfWindow;
         let endIdx = i + nSamplesInHalfWindow + 1;
 
-        
         startIdx = Math.max(0, startIdx);
         endIdx = Math.min(signal.length, endIdx);
 
         const window = signal.slice(startIdx, endIdx);
-        if (window.length > 0) { 
+        if (window.length > 0) {
             newIntegralSignal.push(mean(window));
         } else {
-            newIntegralSignal.push(0); 
+            newIntegralSignal.push(0);
         }
     }
 
