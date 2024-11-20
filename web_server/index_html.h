@@ -382,17 +382,20 @@ button:hover {
             </div>
             <hr>
             <div class='row'>
-                <div class='col-6'>
+                <div class='col-4'>
                     <div id='bpm-container'>
                         <h3 id='bpm-result'></h3>
                         <h3 id='alert'></h3>
                     </div>
                 </div>
-                <div class='col-6'>
+                <div class='col-4'>
                     <div class='d-flex justify-content-center'>
                         <button id='more-info-button' class='btn btn-primary'>Get more information about my state</button>
                     </div>
                     <div style='height: 50px; text-align: center;'></div>
+                </div>
+                <div class='col-4'>
+                    <h3 id='arrhythmia-count'></h3>
                 </div>
             </div>
             <div class='row'>
@@ -444,7 +447,7 @@ let peaks = [];
 let tachogramTimeArray = [];
 let newData = [];
 let rrInterestIntervals = [];
-
+let lastArrhythmiaCount = 0;
 
 let ecgChart;
 let tachogramChart;
@@ -676,8 +679,21 @@ function findArrhythmias() {
             arrhythmias.push({data: window, time: timeWindowArray});
         }
     }
-    console.log(`Arrhythmias found: ${arrhythmias.length}`);
+    
+    if (arrhythmias.length != lastArrhythmiaCount) {
+        lastArrhythmiaCount = arrhythmias.length;
+        updateArrhythmiaCountView(arrhythmias.length);
+    }
     return arrhythmias;
+}
+
+function updateArrhythmiaCountView(count) {
+    if (count === 0) {
+        document.getElementById('arrhythmia-count').innerText = `No arrhythmias detected.`;
+    } else {
+        document.getElementById('arrhythmia-count').innerText = `${count} arrhythmias detected.`;
+    }
+
 }
 
 function applyMovingAverage(signal, windowSize = 5) {
