@@ -166,6 +166,20 @@ function updateBuffers(buffer) {
     }
 }
 
+function plotArrhythmias(arrhythmias) {
+    arrhythmias.forEach(arrhythmia => {
+        ecgChart.addSeries({
+            name: 'Arrhythmia',
+            data: arrhythmia.data.map((value, index) => [arrhythmia.time[index], value]),
+            color: 'red',
+            lineWidth: 2,
+            marker: {
+                enabled: false
+            }
+        });
+    });
+}
+
 function reducedPamTompkins() {
 
     const filteredECG = applyMovingAverage(newData, 5);
@@ -185,14 +199,10 @@ function reducedPamTompkins() {
     peaks = findPeaks(integralSignal, 120, 2);
 
     rrIntervals = calculateTachogram(peaks, sampleRateHz);
-    console.log(rrIntervals);
-
-    calculateBPM();
-
+    
     return newIntegralSignal;
 
 }
-
 
 function findArrhythmias() {
     let arrhythmias = [];
@@ -201,13 +211,25 @@ function findArrhythmias() {
 
     for (let i = 0; i < rrIntervals.length; i++) {
         if (rrIntervals[i] < rrIntervalsMean - 3 * rrIntervalsSD || rrIntervals[i] > rrIntervalsMean + 3 * rrIntervalsSD) {
-            arrhythmias.push(i);
+            const secondsToStore = 5;
+            const timeWindow = secondsToStore * sampleRateHz;
+            const halfWindow = Math.floor(timeWindow / 2);
+            const nSamplesInHalfWindow = Math.round(halfWindow / samplePeriodMs);
+
+            let startIdx = i - nSamplesInHalfWindow;
+            let endIdx = i + nSamplesInHalfWindow;
+
+            startIdx = Math.max(0, startIdx);
+            endIdx = Math.min(rrIntervals.length, endIdx);
+
+            const window = ECGsignal.slice(startIdx, endIdx);
+            const timeWindowArray = timeArray.slice(startIdx, endIdx);
+            arrhythmias.push({data: window, time: timeWindowArray});
         }
     }
 
     return arrhythmias;
 }
-
 
 function applyMovingAverage(signal, windowSize = 5) {
     const filtered = [];
@@ -259,14 +281,10 @@ function slidingWindowIntegration(signal, samplePeriod, windowSize) {
     return newIntegralSignal;
 }
 
-
-
-
 function mean(arr) {
     if (arr.length === 0) return 0; // Return a default value to avoid NaN
     return arr.reduce((sum, value) => sum + value, 0) / arr.length;
 }
-
 
 function max(signal) {
     let maxVal = signal[0];
@@ -335,6 +353,8 @@ function updateView() {
     updatePeaksChart(newIntegralSignal);
     updateTachogramChart();
     calculateBPM();
+    const arrhythmias = findArrhythmias();
+    plotArrhythmias(arrhythmias);
 }
 
 function calculateBPM() {
