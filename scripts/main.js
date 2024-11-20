@@ -18,7 +18,7 @@ let peaks = [];
 let tachogramTimeArray = [];
 let newData = [];
 let rrInterestIntervals = [];
-
+let lastArrhythmiaCount = 0;
 
 let ecgChart;
 let tachogramChart;
@@ -250,8 +250,21 @@ function findArrhythmias() {
             arrhythmias.push({data: window, time: timeWindowArray});
         }
     }
-    console.log(`Arrhythmias found: ${arrhythmias.length}`);
+    
+    if (arrhythmias.length != lastArrhythmiaCount) {
+        lastArrhythmiaCount = arrhythmias.length;
+        updateArrhythmiaCountView(arrhythmias.length);
+    }
     return arrhythmias;
+}
+
+function updateArrhythmiaCountView(count) {
+    if (count === 0) {
+        document.getElementById('arrhythmia-count').innerText = `No arrhythmias detected.`;
+    } else {
+        document.getElementById('arrhythmia-count').innerText = `${count} arrhythmias detected.`;
+    }
+
 }
 
 function applyMovingAverage(signal, windowSize = 5) {
