@@ -200,7 +200,7 @@ function findArrhythmias() {
     let rrIntervalsSD = Math.sqrt(rrIntervals.reduce((acc, curr) => acc + Math.pow(curr - rrIntervalsMean, 2), 0) / rrIntervals.length);
 
     for (let i = 0; i < rrIntervals.length; i++) {
-        if (rrIntervals[i] < rrIntervalsMean - 2 * rrIntervalsSD || rrIntervals[i] > rrIntervalsMean + 2 * rrIntervalsSD) {
+        if (rrIntervals[i] < rrIntervalsMean - 3 * rrIntervalsSD || rrIntervals[i] > rrIntervalsMean + 3 * rrIntervalsSD) {
             arrhythmias.push(i);
         }
     }
