@@ -80,7 +80,7 @@ function initializeECGChart() {
         xAxis: { title: { text: 'Time (seconds)' }, categories: [] },
         yAxis: { title: { text: 'Amplitude (mV)' } },
         series: [
-            { name: 'ECG Signal', data: [] }, // ECG signal series
+            { name: 'ECG Signal', data: [] },
             { 
                 name: 'Arrhythmias', 
                 data: [], 
@@ -88,13 +88,13 @@ function initializeECGChart() {
                 type: 'scatter', 
                 marker: { 
                     radius: 4, 
-                    enabled: true // Ensure marker is enabled for this series
+                    enabled: true
                 } 
             }
         ],
         plotOptions: {
-            line: { marker: { enabled: false } }, // Applies only to line series
-            scatter: { marker: { enabled: true } } // Explicitly enable markers for scatter series
+            line: { marker: { enabled: false } },
+            scatter: { marker: { enabled: true } }
         }
     });
 }
@@ -112,7 +112,7 @@ function initializeTachogramChart() {
 }
 
 function initializePeaksChart() {
-    peaksChart = Highcharts.chart('peaks-container', { // Correctly assign to peaksChart
+    peaksChart = Highcharts.chart('peaks-container', {
         chart: { type: 'line', animation: false },
         title: { text: 'Integrated Signal with Peaks' },
         xAxis: { title: { text: 'Time (seconds)' } },
@@ -147,7 +147,7 @@ function updateECGChart() {
 function updateTachogramChart() {
     for (let i = 0; i < rrIntervals.length; i++) {
         const newTachoPoint = [
-            tachogramTimeArray[i], // Use updated time array
+            tachogramTimeArray[i],
             rrIntervals[i]
         ];
         tachogramChart.series[0].addPoint(newTachoPoint, true, tachogramChart.series[0].data.length >= bufferSize);
@@ -186,20 +186,17 @@ function updateBuffers(buffer) {
 function plotArrhythmias(arrhythmias) {
     const arrhythmiaPoints = [];
 
-    // Collect arrhythmia points within the current time buffer
     arrhythmias.forEach(arrhythmia => {
         const { data, time } = arrhythmia;
 
         data.forEach((value, index) => {
             const timePoint = time[index];
-            // Only include arrhythmias within the current buffer range
             if (timePoint >= timeArray[0] && timePoint <= timeArray[timeArray.length - 1]) {
                 arrhythmiaPoints.push([timePoint, value]);
             }
         });
     });
 
-    // Update the arrhythmia series (series[1])
     ecgChart.series[1].setData(arrhythmiaPoints, true);
 }
 
@@ -323,7 +320,7 @@ function slidingWindowIntegration(signal, samplePeriod, windowSize) {
 }
 
 function mean(arr) {
-    if (arr.length === 0) return 0; // Return a default value to avoid NaN
+    if (arr.length === 0) return 0;
     return arr.reduce((sum, value) => sum + value, 0) / arr.length;
 }
 
@@ -380,10 +377,10 @@ function calculateTachogram(peaks, sampleRate) {
     for (let i = 1; i < peaks.length; i++) {
         const RR = (peaks[i] - peaks[i - 1]) / sampleRate;
         newTachogram.push(RR);
-        newTachogramTimeArray.push(timeArray[peaks[i - 1]]); // Use time from timeArray
+        newTachogramTimeArray.push(timeArray[peaks[i - 1]]);
     }
 
-    tachogramTimeArray = newTachogramTimeArray; // Update the global time array
+    tachogramTimeArray = newTachogramTimeArray;
     return newTachogram;
 }
 
