@@ -7,6 +7,7 @@ let samplePeriodMs = 0;
 let sampleRateHz = 0;
 let bufferSize = 0;
 let requestIntervalMs = 0;
+let rrIntervalsMean = 0;
 
 let timeCounter = 0;
 let ECGsignal = [];
@@ -16,6 +17,8 @@ let integralSignal = [];
 let peaks = [];
 let tachogramTimeArray = [];
 let newData = [];
+let rrInterestIntervals = [];
+
 
 let ecgChart;
 let tachogramChart;
@@ -84,7 +87,7 @@ function initializeTachogramChart() {
     tachogramChart = Highcharts.chart('tachogram-container', {
         chart: { type: 'line', animation: false },
         title: { text: 'Tachogram' },
-        xAxis: { title: { text: 'Beats' } },
+        xAxis: { title: { text: 'Time' } },
         yAxis: { title: { text: 'RR-interval (seconds)' } },
         series: [{ name: 'RR-interval', data: [] }],
         plotOptions: { series: { marker: { enabled: false } } }
@@ -125,10 +128,9 @@ function updateECGChart() {
 }
 
 function updateTachogramChart() {
-    // TODO: update with new data that comes in buffer
     for (let i = 0; i < rrIntervals.length; i++) {
         const newTachoPoint = [
-            tachogramTimeArray[tachogramTimeArray.length - rrIntervals.length + i],
+            tachogramTimeArray[i], // Use updated time array
             rrIntervals[i]
         ];
         tachogramChart.series[0].addPoint(newTachoPoint, true, tachogramChart.series[0].data.length >= bufferSize);
@@ -183,12 +185,29 @@ function reducedPamTompkins() {
     peaks = findPeaks(integralSignal, 120, 2);
 
     rrIntervals = calculateTachogram(peaks, sampleRateHz);
+    console.log(rrIntervals);
 
     calculateBPM();
 
     return newIntegralSignal;
 
 }
+
+
+function findArrhythmias() {
+    let arrhythmias = [];
+    let rrIntervalsMean = mean(rrIntervals);
+    let rrIntervalsSD = Math.sqrt(rrIntervals.reduce((acc, curr) => acc + Math.pow(curr - rrIntervalsMean, 2), 0) / rrIntervals.length);
+
+    for (let i = 0; i < rrIntervals.length; i++) {
+        if (rrIntervals[i] < rrIntervalsMean - 2 * rrIntervalsSD || rrIntervals[i] > rrIntervalsMean + 2 * rrIntervalsSD) {
+            arrhythmias.push(i);
+        }
+    }
+
+    return arrhythmias;
+}
+
 
 function applyMovingAverage(signal, windowSize = 5) {
     const filtered = [];
@@ -302,7 +321,7 @@ function calculateTachogram(peaks, sampleRate) {
     for (let i = 1; i < peaks.length; i++) {
         const RR = (peaks[i] - peaks[i - 1]) / sampleRate;
         newTachogram.push(RR);
-        newTachogramTimeArray.push(i - 1); // Use the beat index as x-axis
+        newTachogramTimeArray.push(timeArray[peaks[i - 1]]); // Use time from timeArray
     }
 
     tachogramTimeArray = newTachogramTimeArray; // Update the global time array
