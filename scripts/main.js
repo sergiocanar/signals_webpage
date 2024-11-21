@@ -287,6 +287,12 @@ function applyMovingAverage(signal, windowSize = 5) {
 }
 
 function diffAndSquare(signal) {
+    if (ECGsignal.length > 0) {
+        signal.unshift(ECGsignal[ECGsignal.length - 1]);
+    } else {
+        signal.unshift(signal[0]);
+    }
+    
     const diffSignal = [];
 
     for (let i = 0; i < signal.length - 1; i++) {
