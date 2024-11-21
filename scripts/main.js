@@ -8,7 +8,6 @@ let sampleRateHz = 0;
 let bufferSize = 0;
 let requestIntervalMs = 0;
 let rrIntervalsMean = 0;
-let lastArrhythmiaCount = 0;
 let arrhythmiaCount = 0;
 
 let timeCounter = 0;
@@ -226,6 +225,7 @@ function reducedPamTompkins() {
 }
 
 function findArrhythmias() {
+    const lastArrhythmiaCount = arrhythmiaCount;
     let arrhythmias = [];
     let rrIntervalsMean = mean(rrIntervals);
     let rrIntervalsSD = Math.sqrt(rrIntervals.reduce((acc, curr) => acc + Math.pow(curr - rrIntervalsMean, 2), 0) / rrIntervals.length);
@@ -246,12 +246,12 @@ function findArrhythmias() {
             const window = ECGsignal.slice(startIdx, endIdx);
             const timeWindowArray = timeArray.slice(startIdx, endIdx);
             arrhythmias.push({data: window, time: timeWindowArray});
+            arrhythmiaCount++;
         }
     }
     
-    if (arrhythmias.length != lastArrhythmiaCount) {
-        lastArrhythmiaCount = arrhythmias.length;
-        updateArrhythmiaCountView(arrhythmias.length);
+    if (arrhythmiaCount > lastArrhythmiaCount) {
+        updateArrhythmiaCountView(arrhythmiaCount);
         arrhythmiaPopup();
     }
     return arrhythmias;
